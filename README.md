@@ -220,8 +220,6 @@ In accordance with the project guidelines, the team declares the AI tools utiliz
 - **Claude / Gemini (Google DeepMind):** Used for architectural planning assistance, reviewing entity schema consistency, generating initial documentation drafts, and refining slide presentations.
 - **Unsplash (Free License):** Sourcing high-resolution, freely licensed garment imagery for the 32 catalogue products.
 
-*Every team member has reviewed, understood, and can explain every part of the codebase, data schemas, and architectural decisions upon request.*
-
 ---
 
 ## 👥 Authors
