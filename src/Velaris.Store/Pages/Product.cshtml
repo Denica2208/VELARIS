@@ -1,0 +1,83 @@
+@page
+@model ProductModel
+@{
+    ViewData["Title"] = Model.Product?.Name ?? "Product";
+}
+
+@if (Model.Product != null)
+{
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+        <a href="/" class="inline-flex items-center text-xs text-slate-400 hover:text-gold mb-8 transition">
+            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+            Back to Capsule Catalogue
+        </a>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            <!-- Image Gallery -->
+            <div class="bg-surface border gold-border rounded-3xl overflow-hidden aspect-[4/5] relative shadow-2xl">
+                <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" class="w-full h-full object-cover" />
+                <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-md border gold-border px-3.5 py-1.5 rounded-full text-xs font-bold text-gold uppercase tracking-wider">
+                    @Model.Product.FabricGsm GSM Fabric Weight
+                </div>
+            </div>
+
+            <!-- Product Specs -->
+            <div class="flex flex-col space-y-6">
+                <div>
+                    <span class="text-xs uppercase font-bold text-gold tracking-widest">@Model.Product.Category?.Name</span>
+                    <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white mt-1">@Model.Product.Name</h1>
+                    <div class="text-xs text-slate-400 mt-1">SKU: <code class="text-slate-300">@Model.Product.SKU</code></div>
+                </div>
+
+                <div class="flex items-baseline space-x-4 border-y border-slate-800 py-4">
+                    <span class="text-3xl font-extrabold text-white">@Model.Product.Price.ToString("F2") RON</span>
+                    <span class="text-xs text-slate-400">TVA inclus &amp; livrare asigurată</span>
+                </div>
+
+                <p class="text-sm text-slate-300 leading-relaxed">
+                    @Model.Product.Description
+                </p>
+
+                <!-- Size Selector -->
+                <div>
+                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Garment Size</label>
+                    <div class="grid grid-cols-4 gap-3">
+                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">S</button>
+                        <button type="button" class="border border-gold rounded-xl py-2.5 text-xs font-bold bg-gold text-canvas">M</button>
+                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">L</button>
+                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">XL</button>
+                    </div>
+                </div>
+
+                <!-- Stock & Add to Cart -->
+                <div class="pt-4 space-y-4">
+                    <div class="flex items-center text-xs">
+                        <span class="w-2.5 h-2.5 rounded-full bg-sage mr-2 animate-pulse"></span>
+                        <span class="text-slate-300">Current available stock: <strong class="text-white">@Model.Product.StockLevel units</strong></span>
+                    </div>
+
+                    <button type="button" onclick="alert('Item added to cart! (Demonstration)')"
+                            class="w-full bg-gold hover:bg-gold-light text-canvas text-sm font-bold py-3.5 px-6 rounded-2xl shadow-lg transition duration-200">
+                        Add to Capsule Cart (A3)
+                    </button>
+                </div>
+
+                <!-- Sustainable Attributes -->
+                <div class="bg-surface/50 border gold-border rounded-2xl p-4 space-y-2 text-xs text-slate-400">
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Material Composition: @Model.Product.Material
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Pre-shrunk organic fabric (guaranteed zero shrinkage after wash)
+                    </div>
+                    <div class="flex items-center">
+                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Tested on mobile viewports down to 360px (A11)
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+}

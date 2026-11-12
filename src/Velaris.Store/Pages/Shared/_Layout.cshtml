@@ -1,0 +1,131 @@
+﻿<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>@ViewData["Title"] — VELARIS Atelier</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        canvas: '#0D1017',
+                        surface: '#141A26',
+                        'surface-hover': '#1C2436',
+                        gold: '#E5B869',
+                        'gold-light': '#F3D39B',
+                        terracotta: '#E07A5F',
+                        sage: '#4EBA87',
+                    },
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                        display: ['Outfit', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@500;600;700;800&family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body { background-color: #0D1017; color: #F8FAFC; }
+        .gold-border { border-color: rgba(229, 184, 105, 0.2); }
+    </style>
+</head>
+<body class="flex flex-col min-h-screen">
+    <!-- Top Announcement Bar -->
+    <div class="bg-surface border-b gold-border text-center py-2 text-xs text-gold-light tracking-widest uppercase font-semibold">
+        ✦ Contemporary Streetwear &amp; Sustainable Capsule Living · Free Shipping over 300 RON
+    </div>
+
+    <!-- Navigation Header -->
+    <header class="sticky top-0 z-50 bg-canvas/90 backdrop-blur-md border-b gold-border">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
+            <div class="flex items-center space-x-8">
+                <a href="/" class="text-3xl font-extrabold tracking-tighter text-white font-display">
+                    VELARIS<span class="text-gold">.</span>
+                </a>
+                <nav class="hidden md:flex space-x-6 text-sm font-medium text-slate-300">
+                    <a href="/" class="hover:text-gold transition">All Items</a>
+                    <a href="/?category=hoodies" class="hover:text-gold transition">Hoodies</a>
+                    <a href="/?category=t-shirts" class="hover:text-gold transition">T-Shirts</a>
+                    <a href="/?category=denim" class="hover:text-gold transition">Denim</a>
+                    <a href="/?category=jackets" class="hover:text-gold transition">Outerwear</a>
+                </nav>
+            </div>
+
+            <!-- Search & Actions -->
+            <div class="flex items-center space-x-4">
+                <form method="get" action="/" class="hidden sm:flex items-center relative">
+                    <input type="text" name="search" placeholder="Search catalog..." 
+                           class="bg-surface border gold-border rounded-full py-1.5 pl-4 pr-9 text-xs text-white placeholder-slate-400 focus:outline-none focus:border-gold w-44 lg:w-56" />
+                    <button type="submit" class="absolute right-3 text-slate-400 hover:text-gold">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                    </button>
+                </form>
+
+                <div class="flex items-center space-x-3 text-sm">
+                    @if (User.Identity?.IsAuthenticated == true)
+                    {
+                        <span class="text-xs text-gold">@User.Identity.Name</span>
+                        <a href="/Account/Logout" class="text-xs text-slate-400 hover:text-white">Sign Out</a>
+                    }
+                    else
+                    {
+                        <a href="/Account/Login" class="text-xs text-slate-300 hover:text-gold font-medium">Sign In</a>
+                        <a href="/Account/Register" class="text-xs bg-gold/10 border border-gold/30 text-gold px-3 py-1 rounded-full hover:bg-gold hover:text-canvas transition font-semibold">Join</a>
+                    }
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main role="main" class="flex-grow">
+        @RenderBody()
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-surface border-t gold-border mt-20 py-12 text-sm text-slate-400">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 grid grid-cols-1 md:grid-cols-4 gap-8">
+            <div>
+                <span class="text-2xl font-bold font-display text-white tracking-tight">VELARIS<span class="text-gold">.</span></span>
+                <p class="mt-3 text-xs leading-relaxed text-slate-400">
+                    A curated contemporary streetwear and sustainable capsule wardrobe online store. Designed for Gen-Z and urban professionals.
+                </p>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-gold mb-3">Categories</h4>
+                <ul class="space-y-1.5 text-xs">
+                    <li><a href="/?category=hoodies" class="hover:text-white">Heavyweight Hoodies &amp; Sweats</a></li>
+                    <li><a href="/?category=t-shirts" class="hover:text-white">Boxy &amp; Relaxed T-Shirts</a></li>
+                    <li><a href="/?category=denim" class="hover:text-white">Structured Denim &amp; Cargo</a></li>
+                    <li><a href="/?category=jackets" class="hover:text-white">Weatherproof Outerwear</a></li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-gold mb-3">Engineering Spec</h4>
+                <ul class="space-y-1.5 text-xs">
+                    <li>ASP.NET Core 8.0 &amp; C#</li>
+                    <li>SQLite Relational Database (EF Core)</li>
+                    <li>Stripe Sandbox Webhook Flow</li>
+                    <li>Mobile Responsive (360px Viewport)</li>
+                </ul>
+            </div>
+            <div>
+                <h4 class="text-xs font-bold uppercase tracking-wider text-gold mb-3">Academic Team</h4>
+                <p class="text-xs leading-relaxed">
+                    <strong>Predut Andreea-Denisa</strong> (Frontend &amp; UX)<br>
+                    <strong>Sapca Roman-Stefan</strong> (Backend &amp; DB)<br>
+                    E-Commerce Semester Project 2026–2027
+                </p>
+            </div>
+        </div>
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-8 pt-6 border-t border-slate-800 text-center text-xs text-slate-500">
+            &copy; 2026 VELARIS Atelier. All rights reserved. Stage P2 Approved Prototype.
+        </div>
+    </footer>
+
+    @await RenderSectionAsync("Scripts", required: false)
+</body>
+</html>

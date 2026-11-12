@@ -1,0 +1,61 @@
+@page
+@model Velaris.Store.Pages.Account.RegisterModel
+@{
+    ViewData["Title"] = "Customer Registration";
+}
+
+<div class="max-w-md mx-auto px-4 py-16">
+    <div class="bg-surface border gold-border rounded-3xl p-8 shadow-2xl">
+        <div class="text-center mb-8">
+            <span class="text-xs uppercase font-bold text-gold tracking-widest">New Member</span>
+            <h1 class="text-2xl font-bold font-display text-white mt-1">Join the Atelier</h1>
+            <p class="text-xs text-slate-400 mt-1">Create an account to save sizes, addresses, and order tracking.</p>
+        </div>
+
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-6 bg-rose-500/10 border border-rose-500/30 text-rose-400 text-xs p-3 rounded-xl">
+                @Model.ErrorMessage
+            </div>
+        }
+
+        <form method="post" class="space-y-4">
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Full Name</label>
+                <input type="text" asp-for="FullName" required 
+                       class="w-full bg-slate-900 border gold-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold"
+                       placeholder="Andreea Predut" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Email Address</label>
+                <input type="email" asp-for="Email" required 
+                       class="w-full bg-slate-900 border gold-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold"
+                       placeholder="andreea@example.com" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Password</label>
+                <input type="password" asp-for="Password" required 
+                       class="w-full bg-slate-900 border gold-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold"
+                       placeholder="••••••••••••" />
+            </div>
+
+            <div>
+                <label class="block text-xs font-semibold text-slate-300 mb-1">Delivery Address (A4)</label>
+                <input type="text" asp-for="ShippingAddress" required 
+                       class="w-full bg-slate-900 border gold-border rounded-xl px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold"
+                       placeholder="Str. Libertatii nr. 10, Craiova" />
+            </div>
+
+            <button type="submit" 
+                    class="w-full bg-gold hover:bg-gold-light text-canvas text-xs font-bold py-3 px-4 rounded-xl transition font-display uppercase tracking-wider">
+                Create Account (A4)
+            </button>
+        </form>
+
+        <div class="mt-6 pt-6 border-t border-slate-800 text-center text-xs text-slate-400">
+            Already registered? <a href="/Account/Login" class="text-gold font-semibold hover:underline">Sign In</a>
+        </div>
+    </div>
+</div>

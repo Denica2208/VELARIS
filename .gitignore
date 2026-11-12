@@ -43,3 +43,9 @@ Thumbs.db
 Project Specification*.pdf
 Z3N*.pdf
 presentation_*.html
+
+# Local SQLite database files
+*.db
+
+# HTML generator source files
+docs/**/*.html
