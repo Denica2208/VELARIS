@@ -24,11 +24,13 @@ public class IndexModel : PageModel
     public int TotalPages { get; set; }
     public const int PageSize = 12; // Capped below the 24 items limit (A1)
 
-    public async Task OnGetAsync(string? category, string? search, int p = 1)
+    public async Task OnGetAsync(string? category, string? search, int? p = null, int? page = null)
     {
         CurrentCategory = category;
         SearchQuery = search;
-        CurrentPage = Math.Max(1, p);
+        
+        int requestedPage = p ?? page ?? 1;
+        CurrentPage = Math.Max(1, requestedPage);
 
         Categories = await _context.Categories.AsNoTracking().ToListAsync();
 
@@ -53,10 +55,29 @@ public class IndexModel : PageModel
         var totalItems = await query.CountAsync();
         TotalPages = (int)Math.Ceiling(totalItems / (double)PageSize);
 
+        if (TotalPages > 0 && CurrentPage > TotalPages)
+        {
+            CurrentPage = TotalPages;
+        }
+
         Products = await query
             .OrderBy(p => p.Id)
             .Skip((CurrentPage - 1) * PageSize)
             .Take(PageSize)
             .ToListAsync();
+    }
+
+    public string GetPageUrl(int pageNumber)
+    {
+        var queryParams = new List<string> { $"p={pageNumber}" };
+        if (!string.IsNullOrWhiteSpace(CurrentCategory))
+        {
+            queryParams.Add($"category={Uri.EscapeDataString(CurrentCategory)}");
+        }
+        if (!string.IsNullOrWhiteSpace(SearchQuery))
+        {
+            queryParams.Add($"search={Uri.EscapeDataString(SearchQuery)}");
+        }
+        return "/?" + string.Join("&", queryParams);
     }
 }

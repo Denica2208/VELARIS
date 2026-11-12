@@ -108,7 +108,7 @@
             <div class="mt-12 flex justify-center items-center space-x-2">
                 @if (Model.CurrentPage > 1)
                 {
-                    <a href="/?page=@(Model.CurrentPage - 1)&category=@Model.CurrentCategory&search=@Model.SearchQuery" 
+                    <a href="@Model.GetPageUrl(Model.CurrentPage - 1)" 
                        class="px-4 py-2 rounded-lg bg-surface border gold-border text-xs text-slate-300 hover:text-gold transition">
                         &larr; Prev
                     </a>
@@ -116,15 +116,15 @@
                 
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
-                    <a href="/?page=@i&category=@Model.CurrentCategory&search=@Model.SearchQuery" 
-                       class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold border transition @(i == Model.CurrentPage ? "bg-gold text-canvas border-gold" : "bg-surface border-slate-700 text-slate-300 hover:border-gold")">
+                    <a href="@Model.GetPageUrl(i)" 
+                       class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold border transition @(i == Model.CurrentPage ? "bg-gold text-canvas border-gold font-black shadow-md" : "bg-surface border-slate-700 text-slate-300 hover:border-gold hover:text-gold")">
                         @i
                     </a>
                 }
 
                 @if (Model.CurrentPage < Model.TotalPages)
                 {
-                    <a href="/?page=@(Model.CurrentPage + 1)&category=@Model.CurrentCategory&search=@Model.SearchQuery" 
+                    <a href="@Model.GetPageUrl(Model.CurrentPage + 1)" 
                        class="px-4 py-2 rounded-lg bg-surface border gold-border text-xs text-slate-300 hover:text-gold transition">
                         Next &rarr;
                     </a>
