@@ -1,0 +1,45 @@
+# Build results
+[Dd]ebug/
+[Dd]ebugPublic/
+[Rr]elease/
+[Rr]eleases/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
+[Bb]in/
+[Oo]bj/
+[Ll]og/
+[Ll]ogs/
+
+# Visual Studio files
+.vs/
+*.user
+*.userosscache
+*.sln.docstates
+*.suo
+
+# Visual Studio Code
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
+# Environment variables & secrets
+.env
+!.env.example
+
+# Local SQLite databases (if dynamic)
+*.db-shm
+*.db-wal
+
+# OS generated files
+.DS_Store
+Thumbs.db
+
+# Assignment specs & reference files
+Project Specification*.pdf
+Z3N*.pdf
+presentation_*.html
