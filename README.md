@@ -121,7 +121,9 @@ ProjectEC/
 ├── .env.example                 # Environment variables template
 ├── .gitignore                   # Ignore rules for build output, databases, and OS files
 ├── README.md                    # Project documentation (this file)
-└── VELARIS_Presentation_P1.pdf  # Stage P1 approved presentation slides
+├── VELARIS_Presentation_P1.pdf  # Stage P1 approved presentation slides
+├── VELARIS_Presentation_P2.pdf  # Stage P2 presentation slides (with visual diagrams & mockups)
+└── VELARIS_P2_Specification.pdf # Stage P2 official 8-page frozen technical specification document
 ```
 
 ---
