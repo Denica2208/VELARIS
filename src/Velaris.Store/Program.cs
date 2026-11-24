@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 using Velaris.Store.Data;
+using Velaris.Store.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,11 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
 
 builder.Services.AddDbContext<VelarisDbContext>(options =>
     options.UseSqlite(connectionString));
+
+// Add HttpContextAccessor and Store Services
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<WishlistService>();
 
 // Add Authentication
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

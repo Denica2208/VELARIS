@@ -5,16 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Velaris.Store.Data;
+using Velaris.Store.Services;
 
 namespace Velaris.Store.Pages.Account;
 
 public class LoginModel : PageModel
 {
     private readonly VelarisDbContext _context;
+    private readonly CartService _cartService;
+    private readonly WishlistService _wishlistService;
 
-    public LoginModel(VelarisDbContext context)
+    public LoginModel(VelarisDbContext context, CartService cartService, WishlistService wishlistService)
     {
         _context = context;
+        _cartService = cartService;
+        _wishlistService = wishlistService;
     }
 
     [BindProperty]
@@ -46,6 +51,8 @@ public class LoginModel : PageModel
             return Page();
         }
 
+        var guestSessionId = _cartService.GetOrCreateSessionId();
+
         var claims = new List<Claim>
         {
             new(ClaimTypes.NameIdentifier, user.Id),
@@ -56,6 +63,10 @@ public class LoginModel : PageModel
 
         var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(claimsIdentity));
+
+        // Merge guest cart and wishlist items into user account (A3 & B7)
+        await _cartService.MergeGuestCartToUserAsync(guestSessionId, user.Id);
+        await _wishlistService.MergeGuestWishlistToUserAsync(guestSessionId, user.Id);
 
         return RedirectToPage("/Index");
     }
