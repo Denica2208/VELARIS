@@ -1,3 +1,4 @@
+using Microsoft.EntityFrameworkCore;
 using Velaris.Store.Models;
 
 namespace Velaris.Store.Data;
@@ -7,6 +8,64 @@ public static class DbInitializer
     public static void Initialize(VelarisDbContext context)
     {
         context.Database.EnsureCreated();
+
+        // Ensure newly introduced P3 tables exist in SQLite database
+        context.Database.ExecuteSqlRaw(@"
+            CREATE TABLE IF NOT EXISTS CartItems (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId TEXT NULL,
+                SessionId TEXT NULL,
+                ProductId INTEGER NOT NULL,
+                Quantity INTEGER NOT NULL DEFAULT 1,
+                SelectedSize TEXT NOT NULL DEFAULT 'M',
+                UpdatedAt TEXT NOT NULL,
+                FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
+                FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS WishlistItems (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                UserId TEXT NULL,
+                SessionId TEXT NULL,
+                ProductId INTEGER NOT NULL,
+                CreatedAt TEXT NOT NULL,
+                FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE CASCADE,
+                FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE CASCADE
+            );
+
+            CREATE TABLE IF NOT EXISTS Orders (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderNumber TEXT NOT NULL UNIQUE,
+                UserId TEXT NULL,
+                CustomerEmail TEXT NOT NULL,
+                CustomerName TEXT NOT NULL,
+                ShippingAddress TEXT NOT NULL,
+                City TEXT NOT NULL,
+                PostalCode TEXT NOT NULL,
+                DeliveryMethod TEXT NOT NULL,
+                Subtotal NUMERIC(10,2) NOT NULL,
+                ShippingCost NUMERIC(10,2) NOT NULL,
+                DiscountAmount NUMERIC(10,2) NOT NULL DEFAULT 0,
+                TotalAmount NUMERIC(10,2) NOT NULL,
+                Status TEXT NOT NULL DEFAULT 'New',
+                StripeSessionId TEXT NULL,
+                CreatedAt TEXT NOT NULL,
+                FOREIGN KEY (UserId) REFERENCES Users(Id) ON DELETE SET NULL
+            );
+
+            CREATE TABLE IF NOT EXISTS OrderItems (
+                Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                OrderId INTEGER NOT NULL,
+                ProductId INTEGER NOT NULL,
+                SKU TEXT NOT NULL,
+                ProductName TEXT NOT NULL,
+                SelectedSize TEXT NOT NULL,
+                UnitPrice NUMERIC(10,2) NOT NULL,
+                Quantity INTEGER NOT NULL,
+                FOREIGN KEY (OrderId) REFERENCES Orders(Id) ON DELETE CASCADE,
+                FOREIGN KEY (ProductId) REFERENCES Products(Id) ON DELETE RESTRICT
+            );
+        ");
 
         // Seed users if empty
         if (!context.Users.Any())
