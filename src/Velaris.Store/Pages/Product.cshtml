@@ -1,4 +1,4 @@
-@page
+@page "/Product/{slug?}"
 @model ProductModel
 @{
     ViewData["Title"] = Model.Product?.Name ?? "Product";
@@ -6,22 +6,70 @@
 
 @if (Model.Product != null)
 {
-    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
-        <a href="/" class="inline-flex items-center text-xs text-slate-400 hover:text-gold mb-8 transition">
-            <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-            Back to Capsule Catalogue
-        </a>
+    <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+        <!-- Breadcrumb & Back -->
+        <div class="flex items-center justify-between mb-8">
+            <a href="/" class="inline-flex items-center text-xs text-slate-400 hover:text-gold transition">
+                <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                Înapoi la Catalogul Capsule
+            </a>
+            <div class="text-xs text-slate-500">
+                Colecție <span class="text-gold font-bold">2026/2027</span>
+            </div>
+        </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
-            <!-- Image Gallery -->
-            <div class="bg-surface border gold-border rounded-3xl overflow-hidden aspect-[4/5] relative shadow-2xl">
-                <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" class="w-full h-full object-cover" />
-                <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-md border gold-border px-3.5 py-1.5 rounded-full text-xs font-bold text-gold uppercase tracking-wider">
-                    @Model.Product.FabricGsm GSM Fabric Weight
+        <!-- Feedback Alert Messages -->
+        @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+        {
+            <div class="mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-sm flex items-start space-x-3 shadow-lg">
+                <svg class="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+                <div>
+                    <strong class="font-bold block">Validare Stoc (A3):</strong>
+                    <span>@Model.ErrorMessage</span>
                 </div>
             </div>
+        }
 
-            <!-- Product Specs -->
+        @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+        {
+            <div class="mb-6 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-sm flex items-start justify-between space-x-3 shadow-lg">
+                <div class="flex items-center space-x-3">
+                    <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>@Model.SuccessMessage</span>
+                </div>
+                <a href="/Cart" class="text-xs font-bold text-gold underline hover:text-gold-light">Vezi Coșul &rarr;</a>
+            </div>
+        }
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
+            <!-- Image Gallery & Wishlist Pin -->
+            <div class="bg-surface border gold-border rounded-3xl overflow-hidden aspect-[4/5] relative shadow-2xl">
+                <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" class="w-full h-full object-cover" />
+                
+                <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-md border gold-border px-3.5 py-1.5 rounded-full text-xs font-bold text-gold uppercase tracking-wider">
+                    @Model.Product.FabricGsm GSM Densitate Textilă
+                </div>
+
+                <!-- Wishlist Toggle (B7) -->
+                <form method="post" asp-page-handler="ToggleWishlist" class="absolute top-4 right-4">
+                    <input type="hidden" name="productId" value="@Model.Product.Id" />
+                    <input type="hidden" name="slug" value="@Model.Product.Slug" />
+                    <button type="submit" 
+                            title="@(Model.IsInWishlist ? "Elimină din favorite" : "Salvează la favorite (B7)")"
+                            class="w-10 h-10 rounded-full bg-canvas/80 backdrop-blur-md border gold-border flex items-center justify-center text-rose-500 hover:scale-110 transition shadow-lg">
+                        @if (Model.IsInWishlist)
+                        {
+                            <svg class="w-5 h-5 fill-rose-500 text-rose-500" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                        }
+                        else
+                        {
+                            <svg class="w-5 h-5 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                        }
+                    </button>
+                </form>
+            </div>
+
+            <!-- Product Specs & Interactive Cart Form -->
             <div class="flex flex-col space-y-6">
                 <div>
                     <span class="text-xs uppercase font-bold text-gold tracking-widest">@Model.Product.Category?.Name</span>
@@ -30,54 +78,131 @@
                 </div>
 
                 <div class="flex items-baseline space-x-4 border-y border-slate-800 py-4">
-                    <span class="text-3xl font-extrabold text-white">@Model.Product.Price.ToString("F2") RON</span>
-                    <span class="text-xs text-slate-400">TVA inclus &amp; livrare asigurată</span>
+                    <span class="text-3xl font-extrabold text-white font-display">@Model.Product.Price.ToString("F2") RON</span>
+                    <span class="text-xs text-slate-400">TVA 19% inclus &amp; livrare asigurată</span>
                 </div>
 
                 <p class="text-sm text-slate-300 leading-relaxed">
                     @Model.Product.Description
                 </p>
 
-                <!-- Size Selector -->
-                <div>
-                    <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Garment Size</label>
-                    <div class="grid grid-cols-4 gap-3">
-                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">S</button>
-                        <button type="button" class="border border-gold rounded-xl py-2.5 text-xs font-bold bg-gold text-canvas">M</button>
-                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">L</button>
-                        <button type="button" class="border gold-border rounded-xl py-2.5 text-xs font-bold bg-surface text-white hover:border-gold focus:bg-gold focus:text-canvas transition">XL</button>
-                    </div>
-                </div>
+                <!-- Interactive Add to Cart Form (A3) -->
+                <form method="post" asp-page-handler="AddToCart" class="space-y-6" id="addToCartForm">
+                    <input type="hidden" name="productId" value="@Model.Product.Id" />
+                    <input type="hidden" name="slug" value="@Model.Product.Slug" />
+                    <input type="hidden" name="selectedSize" id="selectedSizeInput" value="M" />
 
-                <!-- Stock & Add to Cart -->
-                <div class="pt-4 space-y-4">
-                    <div class="flex items-center text-xs">
-                        <span class="w-2.5 h-2.5 rounded-full bg-sage mr-2 animate-pulse"></span>
-                        <span class="text-slate-300">Current available stock: <strong class="text-white">@Model.Product.StockLevel units</strong></span>
+                    <!-- Size Selector -->
+                    <div>
+                        <div class="flex justify-between items-center mb-2">
+                            <label class="text-xs font-bold uppercase text-slate-400">Selectează Mărimea</label>
+                            <span class="text-xs text-gold">Mărime selectată: <strong id="selectedSizeLabel" class="font-bold">M</strong></span>
+                        </div>
+                        <div class="grid grid-cols-4 gap-3" id="sizeButtonGroup">
+                            @foreach (var size in new[] { "S", "M", "L", "XL" })
+                            {
+                                var isDefault = size == "M";
+                                <button type="button" 
+                                        data-size="@size"
+                                        onclick="selectSize('@size')"
+                                        class="size-btn border rounded-xl py-2.5 text-xs font-bold transition @(isDefault ? "bg-gold text-canvas border-gold shadow-md" : "border-slate-800 bg-surface text-white hover:border-gold")">
+                                    @size
+                                </button>
+                            }
+                        </div>
                     </div>
 
-                    <button type="button" onclick="alert('Item added to cart! (Demonstration)')"
-                            class="w-full bg-gold hover:bg-gold-light text-canvas text-sm font-bold py-3.5 px-6 rounded-2xl shadow-lg transition duration-200">
-                        Add to Capsule Cart (A3)
-                    </button>
-                </div>
+                    <!-- Quantity & Stock Info -->
+                    <div>
+                        <div class="flex items-center justify-between mb-2">
+                            <label class="text-xs font-bold uppercase text-slate-400">Cantitate</label>
+                            <div class="flex items-center text-xs">
+                                @if (Model.Product.StockLevel > 5)
+                                {
+                                    <span class="w-2.5 h-2.5 rounded-full bg-sage mr-2 animate-pulse"></span>
+                                    <span class="text-slate-300">În stoc: <strong class="text-white">@Model.Product.StockLevel buc.</strong></span>
+                                }
+                                else if (Model.Product.StockLevel > 0)
+                                {
+                                    <span class="w-2.5 h-2.5 rounded-full bg-amber-400 mr-2 animate-pulse"></span>
+                                    <span class="text-amber-400 font-bold">Stoc limitat: @Model.Product.StockLevel bucăți!</span>
+                                }
+                                else
+                                {
+                                    <span class="w-2.5 h-2.5 rounded-full bg-rose-500 mr-2"></span>
+                                    <span class="text-rose-400 font-bold">Epuizat momentan</span>
+                                }
+                            </div>
+                        </div>
+
+                        <div class="flex items-center space-x-3">
+                            <div class="flex items-center bg-surface border gold-border rounded-xl p-1 w-32 justify-between">
+                                <button type="button" onclick="decrementQty()" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-canvas transition font-bold">-</button>
+                                <input type="number" name="quantity" id="quantityInput" value="1" min="1" max="@Model.Product.StockLevel" readonly
+                                       class="w-12 bg-transparent text-center text-sm font-bold text-white focus:outline-none" />
+                                <button type="button" onclick="incrementQty(@Model.Product.StockLevel)" class="w-8 h-8 rounded-lg flex items-center justify-center text-slate-300 hover:text-white hover:bg-canvas transition font-bold">+</button>
+                            </div>
+
+                            <button type="submit" 
+                                    @(Model.Product.StockLevel <= 0 ? "disabled" : "")
+                                    class="flex-grow bg-gold hover:bg-gold-light disabled:opacity-50 disabled:cursor-not-allowed text-canvas text-sm font-bold py-3.5 px-6 rounded-2xl shadow-xl transition duration-200 flex items-center justify-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                <span>@(Model.Product.StockLevel > 0 ? "Adaugă în Coșul Capsule (A3)" : "Stoc Epuizat")</span>
+                            </button>
+                        </div>
+                    </div>
+                </form>
 
                 <!-- Sustainable Attributes -->
                 <div class="bg-surface/50 border gold-border rounded-2xl p-4 space-y-2 text-xs text-slate-400">
                     <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Material Composition: @Model.Product.Material
+                        <svg class="w-4 h-4 mr-2 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Compoziție material: <strong class="text-slate-200 ml-1">@Model.Product.Material</strong>
                     </div>
                     <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Pre-shrunk organic fabric (guaranteed zero shrinkage after wash)
+                        <svg class="w-4 h-4 mr-2 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Bumbac organic pre-spălat (zero contracție la spălare la 30°C)
                     </div>
                     <div class="flex items-center">
-                        <svg class="w-4 h-4 mr-2 text-gold" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                        Tested on mobile viewports down to 360px (A11)
+                        <svg class="w-4 h-4 mr-2 text-gold flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        Verificat pe ecrane mobile de până la 360px lățime (A11)
                     </div>
                 </div>
             </div>
         </div>
     </div>
+
+    <script>
+        function selectSize(size) {
+            document.getElementById('selectedSizeInput').value = size;
+            document.getElementById('selectedSizeLabel').innerText = size;
+            
+            var buttons = document.querySelectorAll('.size-btn');
+            buttons.forEach(function(btn) {
+                if (btn.getAttribute('data-size') === size) {
+                    btn.className = "size-btn border rounded-xl py-2.5 text-xs font-bold transition bg-gold text-canvas border-gold shadow-md";
+                } else {
+                    btn.className = "size-btn border rounded-xl py-2.5 text-xs font-bold transition border-slate-800 bg-surface text-white hover:border-gold";
+                }
+            });
+        }
+
+        function incrementQty(maxStock) {
+            var input = document.getElementById('quantityInput');
+            var current = parseInt(input.value) || 1;
+            if (current < maxStock) {
+                input.value = current + 1;
+            } else {
+                alert("Ai atins limita maximă disponibilă în stoc (" + maxStock + " bucăți)!");
+            }
+        }
+
+        function decrementQty() {
+            var input = document.getElementById('quantityInput');
+            var current = parseInt(input.value) || 1;
+            if (current > 1) {
+                input.value = current - 1;
+            }
+        }
+    </script>
 }
