@@ -1,0 +1,127 @@
+@page
+@model WishlistModel
+@{
+    ViewData["Title"] = "Favorite & Wishlist Capsule";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Header -->
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-8 border-b gold-border mb-8">
+        <div>
+            <div class="flex items-center space-x-2 text-xs text-slate-400 mb-2">
+                <a href="/" class="hover:text-gold transition">Catalog</a>
+                <span>/</span>
+                <span class="text-gold">Favorite &amp; Wishlist (B7)</span>
+            </div>
+            <h1 class="text-3xl sm:text-4xl font-extrabold font-display text-white">Piese Salvate la Favorite</h1>
+        </div>
+        <div class="mt-4 sm:mt-0">
+            <a href="/" class="text-xs text-slate-300 hover:text-gold transition flex items-center font-medium">
+                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+                Continuă cumpărăturile
+            </a>
+        </div>
+    </div>
+
+    <!-- Feedback Alerts -->
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-sm flex items-start space-x-3 shadow-lg">
+            <svg class="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div>@Model.ErrorMessage</div>
+        </div>
+    }
+
+    @if (!string.IsNullOrEmpty(Model.SuccessMessage))
+    {
+        <div class="mb-6 p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-sm flex items-start justify-between space-x-3 shadow-lg">
+            <div class="flex items-center space-x-3">
+                <svg class="w-5 h-5 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>@Model.SuccessMessage</span>
+            </div>
+            <a href="/Cart" class="text-xs font-bold text-gold underline hover:text-gold-light">Mergi la Coș &rarr;</a>
+        </div>
+    }
+
+    @if (!Model.Items.Any())
+    {
+        <!-- Empty State -->
+        <div class="bg-surface/60 border gold-border rounded-3xl p-12 text-center max-w-2xl mx-auto my-12">
+            <div class="w-20 h-20 mx-auto rounded-full bg-surface border gold-border flex items-center justify-center text-rose-400 mb-6 shadow-xl">
+                <svg class="w-10 h-10 fill-none stroke-current" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+            </div>
+            <h2 class="text-2xl font-bold font-display text-white mb-2">Nu ai articole salvate</h2>
+            <p class="text-sm text-slate-400 mb-8 max-w-md mx-auto">
+                Salvează piesele vestimentare preferate apăsând pe simbolul de inimă din catalog pentru a le regăsi oricând aici.
+            </p>
+            <a href="/" class="bg-gold hover:bg-gold-light text-canvas text-sm font-bold py-3.5 px-8 rounded-full transition shadow-lg inline-flex items-center justify-center">
+                Explorează Colecția Noastră
+            </a>
+        </div>
+    }
+    else
+    {
+        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+            @foreach (var item in Model.Items)
+            {
+                var product = item.Product;
+                if (product == null) continue;
+
+                <div class="bg-surface/70 border gold-border rounded-2xl overflow-hidden flex flex-col justify-between transition hover:border-gold/50 shadow-lg group">
+                    <div class="relative aspect-[4/5] bg-canvas overflow-hidden">
+                        <img src="@product.ImageUrl" alt="@product.Name" class="w-full h-full object-cover group-hover:scale-105 transition duration-500" />
+                        
+                        <div class="absolute top-3 left-3 bg-canvas/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold text-gold uppercase tracking-wider border gold-border">
+                            @product.FabricGsm GSM
+                        </div>
+
+                        <!-- Remove button -->
+                        <form method="post" asp-page-handler="Remove" class="absolute top-3 right-3">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            <button type="submit" title="Șterge din favorite" class="w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md border border-slate-700 text-slate-400 hover:text-rose-400 flex items-center justify-center transition">
+                                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                            </button>
+                        </form>
+                    </div>
+
+                    <div class="p-5 flex flex-col flex-grow justify-between space-y-4">
+                        <div>
+                            <span class="text-[10px] uppercase font-bold text-gold tracking-widest">@product.Category?.Name</span>
+                            <h3 class="text-base font-bold text-white mt-1">
+                                <a href="/Product/@product.Slug" class="hover:text-gold transition">@product.Name</a>
+                            </h3>
+                            <div class="flex items-baseline justify-between mt-2">
+                                <span class="text-lg font-extrabold text-white font-display">@product.Price.ToString("F2") RON</span>
+                                <span class="text-xs text-slate-400">
+                                    @(product.StockLevel > 0 ? $"În stoc ({product.StockLevel} buc.)" : "Epuizat")
+                                </span>
+                            </div>
+                        </div>
+
+                        <!-- Move to Cart Form (B7) -->
+                        <form method="post" asp-page-handler="MoveToCart" class="space-y-2 pt-2 border-t border-slate-800">
+                            <input type="hidden" name="productId" value="@product.Id" />
+                            
+                            <div class="flex items-center justify-between text-xs text-slate-400">
+                                <span>Mărime:</span>
+                                <select name="size" class="bg-canvas border border-slate-700 rounded-lg text-xs text-white px-2 py-1 focus:outline-none focus:border-gold">
+                                    <option value="S">S</option>
+                                    <option value="M" selected>M</option>
+                                    <option value="L">L</option>
+                                    <option value="XL">XL</option>
+                                </select>
+                            </div>
+
+                            <button type="submit" 
+                                    @(product.StockLevel <= 0 ? "disabled" : "")
+                                    class="w-full bg-gold/15 hover:bg-gold text-gold hover:text-canvas border border-gold/40 text-xs font-bold py-2.5 px-4 rounded-xl transition duration-200 flex items-center justify-center disabled:opacity-40 disabled:cursor-not-allowed">
+                                <svg class="w-4 h-4 mr-1.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"></path></svg>
+                                <span>Mută în Coș (B7)</span>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
