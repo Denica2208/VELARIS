@@ -5,6 +5,9 @@ namespace Velaris.Store.Data;
 
 public static class DbInitializer
 {
+    private record CategorySeed(string Slug, string Name, string Description);
+    private record ProductSeed(string CategorySlug, string SKU, string Name, string Slug, decimal Price, int StockLevel, int FabricGsm, string Material, string Description, string ImageUrl);
+
     public static void Initialize(VelarisDbContext context)
     {
         context.Database.EnsureCreated();
@@ -95,257 +98,221 @@ public static class DbInitializer
             context.SaveChanges();
         }
 
-        // Auto-upgrade if legacy external URLs are present in database
-        if (context.Products.Any(p => p.ImageUrl.StartsWith("http")))
+        var categorySeeds = new List<CategorySeed>
         {
-            context.Products.RemoveRange(context.Products);
-            context.Categories.RemoveRange(context.Categories);
+            new("hoodies", "Knitwear & Cashmere", "Fine-gauge cashmere, Italian merino wool, and minimalist knitwear for women & men."),
+            new("t-shirts", "Shirts, Blouses & Tops", "100% European linen shirts, crisp Egyptian cotton poplin, and refined daily essentials for women & men."),
+            new("denim", "Tailored Trousers & Denim", "Pleated virgin wool trousers, flowing wide-leg silhouettes, and clean straight-leg denim for women & men."),
+            new("jackets", "Coats, Blazers & Outerwear", "Double-faced wool coats, architectural tailored blazers, and timeless gabardine trenches for women & men.")
+        };
+
+        var productSeeds = new List<ProductSeed>
+        {
+            // Knitwear & Cashmere (4 Women + 4 Men)
+            new("hoodies", "VEL-HOD-01", "Cashmere Crewneck Sweater — Ivory (Women)", "cashmere-crewneck-sweater-ivory",
+                540.00m, 24, 320, "100% Grade-A Mongolian Cashmere",
+                "Minimalist crewneck pullover knitted from whisper-soft pure cashmere in luminous ivory with finely ribbed collar and cuffs.",
+                "/images/products/vel-hod-01.jpg"),
+            new("hoodies", "VEL-HOD-02", "Merino Ribbed Turtleneck — Espresso (Women)", "merino-ribbed-turtleneck-espresso",
+                360.00m, 18, 280, "100% Extra-Fine Italian Merino Wool",
+                "Sleek architectural turtleneck in deep espresso brown with subtle vertical rib texture and clean tailored drape.",
+                "/images/products/vel-hod-02.jpg"),
+            new("hoodies", "VEL-HOD-03", "Cable-Knit Wool Button Cardigan — Warm Stone", "cable-knit-wool-button-cardigan-stone",
+                420.00m, 15, 340, "90% Virgin Wool, 10% Cashmere",
+                "Heritage cable-knit cardigan in warm stone beige accented with natural tortoiseshell buttons and soft brushed wool finish.",
+                "/images/products/vel-hod-03.jpg"),
+            new("hoodies", "VEL-HOD-04", "Men's Merino Crewneck Sweater — Heather Grey", "mens-merino-crewneck-sweater-grey",
+                440.00m, 30, 340, "100% Extra-Fine Italian Merino Wool",
+                "Refined men's crewneck pullover in heathered charcoal-grey merino wool with tailored shoulders and clean ribbed trims.",
+                "/images/products/vel-hod-04.jpg"),
+            new("hoodies", "VEL-HOD-05", "Men's Ribbed Knit Shirt — Cream Ecru", "mens-ribbed-knit-shirt-cream",
+                390.00m, 22, 310, "85% Organic Cotton, 15% Cashmere",
+                "Textured vertical-ribbed knitwear in soft cream ecru crafted for relaxed Italian resort and smart-casual tailoring.",
+                "/images/products/vel-hod-05.jpg"),
+            new("hoodies", "VEL-HOD-06", "Merino Knit Lounge Hoodie — Warm Taupe (Women)", "merino-knit-lounge-hoodie-warm-taupe",
+                450.00m, 12, 330, "100% Extra-Fine Merino Wool",
+                "Luxury knitted hoodie with clean no-drawstring hood and fluid drape in warm taupe — elevated quiet luxury layering.",
+                "/images/products/vel-hod-06.jpg"),
+            new("hoodies", "VEL-HOD-07", "Men's Textured Wool Sweater — Warm Stone", "mens-textured-wool-sweater-stone",
+                410.00m, 20, 350, "80% Merino Wool, 20% Cashmere",
+                "Mid-weight knitted wool sweater in refined stone grey featuring a relaxed silhouette and soft brushed finish.",
+                "/images/products/vel-hod-07.jpg"),
+            new("hoodies", "VEL-HOD-08", "Chunky Ribbed Merino Turtleneck — Noir (Women)", "chunky-ribbed-merino-turtleneck-noir",
+                410.00m, 16, 360, "100% Extra-Fine Italian Merino Wool",
+                "Cozy structured black turtleneck knitted in bold architectural ribbing with deep folded collar and wide cuffs.",
+                "/images/products/vel-hod-08.jpg"),
+
+            // Shirts, Blouses & Tops (4 Women + 4 Men)
+            new("t-shirts", "VEL-TEE-01", "100% European Linen Shirt — Crisp White (Women)", "european-linen-shirt-crisp-white",
+                260.00m, 45, 165, "100% Certified European Flax Linen",
+                "Breezy tailored shirt in pure crisp white linen featuring mother-of-pearl buttons and softly curved editorial hem.",
+                "/images/products/vel-tee-01.jpg"),
+            new("t-shirts", "VEL-TEE-02", "Men's Tailored Linen Dress Shirt — Crisp White", "mens-tailored-linen-dress-shirt-white",
+                290.00m, 50, 160, "100% Belgian Flax Linen",
+                "Signature Massimo-style men's white tailored shirt with sharp collar line, concealed elegance, and breathable natural weave.",
+                "/images/products/vel-tee-02.jpg"),
+            new("t-shirts", "VEL-TEE-03", "Men's Egyptian Poplin Shirt — Powder Blue", "mens-egyptian-poplin-shirt-powder-blue",
+                275.00m, 28, 135, "100% Long-Staple Egyptian Cotton Poplin",
+                "Crisp architectural men's button-down shirt in refined powder blue tailored for both suiting and relaxed trousers.",
+                "/images/products/vel-tee-03.jpg"),
+            new("t-shirts", "VEL-TEE-04", "Men's Striped Oxford Shirt — Charcoal & White", "mens-striped-oxford-shirt-charcoal",
+                265.00m, 32, 165, "100% Organic Cotton Oxford",
+                "Relaxed European cut in classic fine vertical stripes designed to pair effortlessly with cream tailored trousers.",
+                "/images/products/vel-tee-04.jpg"),
+            new("t-shirts", "VEL-TEE-05", "Striped Cotton Poplin Shirt — Sky Blue (Women)", "striped-cotton-poplin-shirt-sky-blue",
+                250.00m, 25, 145, "100% Organic Cotton Poplin",
+                "Timeless blue-and-white striped button-down with relaxed cuffs and structured collar — a quintessential Zara Studio staple.",
+                "/images/products/vel-tee-05.jpg"),
+            new("t-shirts", "VEL-TEE-06", "Supima Cotton Essential Tee — Ivory (Women)", "supima-cotton-essential-tee-ivory",
+                160.00m, 40, 210, "100% Mercerized Supima Cotton",
+                "Silky smooth tailored crewneck t-shirt in warm ivory designed to sit cleanly beneath blazers and wool coats.",
+                "/images/products/vel-tee-06.jpg"),
+            new("t-shirts", "VEL-TEE-07", "Men's Relaxed Cotton Overshirt — Studio White", "mens-relaxed-cotton-overshirt-white",
+                280.00m, 22, 185, "100% Combed Organic Cotton Twill",
+                "Minimalist clean-front men's shirt in crisp studio white with understated tailoring and breathable matte finish.",
+                "/images/products/vel-tee-07.jpg"),
+            new("t-shirts", "VEL-TEE-08", "Mock-Neck Fine Knit Top — Noir (Women)", "mock-neck-fine-knit-top-noir",
+                220.00m, 35, 210, "88% Fine Viscose, 12% Silk",
+                "Second-skin minimalist black turtleneck top styled for sleek editorial elegance with tailored trousers and gold hardware.",
+                "/images/products/vel-tee-08.jpg"),
+
+            // Tailored Trousers & Denim (4 Women + 4 Men)
+            new("denim", "VEL-DNM-01", "High-Waist Double-Pleat Trousers — Cream (Women)", "high-waist-double-pleat-trousers-cream",
+                420.00m, 16, 290, "65% Virgin Wool, 35% Viscose Twill",
+                "Signature Massimo-inspired tailored trousers in warm cream with crisp front pleats and elongating wide straight leg.",
+                "/images/products/vel-dnm-01.jpg"),
+            new("denim", "VEL-DNM-02", "Men's Tailored Virgin Wool Trousers — Noir", "mens-tailored-virgin-wool-trousers-noir",
+                460.00m, 24, 310, "100% Italian Virgin Wool",
+                "Impeccably pressed men's formal-minimalist black wool trousers with sharp centre crease and clean concealed closure.",
+                "/images/products/vel-dnm-02.jpg"),
+            new("denim", "VEL-DNM-03", "Clean Straight Split-Hem Denim — Indigo (Women)", "clean-straight-split-hem-denim-indigo",
+                360.00m, 19, 390, "100% Organic Cotton Rigid Denim",
+                "Minimalist high-rise straight-leg jeans in clean medium-indigo with subtle modern ankle split for sleek footwear styling.",
+                "/images/products/vel-dnm-03.jpg"),
+            new("denim", "VEL-DNM-04", "Flowing Linen Wide Trousers — Warm Sand (Women)", "flowing-linen-wide-trousers-warm-sand",
+                340.00m, 20, 210, "100% Italian Linen",
+                "Fluid high-waisted wide trousers in sunlit sand linen featuring tailored belt loops and effortless summer drape.",
+                "/images/products/vel-dnm-04.jpg"),
+            new("denim", "VEL-DNM-05", "Men's Pleated Dress Trousers — Charcoal", "mens-pleated-dress-trousers-charcoal",
+                410.00m, 14, 280, "74% Virgin Wool, 24% Viscose, 2% Elastane",
+                "Razor-sharp men's tailored trousers in dark charcoal designed to bridge smart office wear and minimalist weekend styling.",
+                "/images/products/vel-dnm-05.jpg"),
+            new("denim", "VEL-DNM-06", "Men's Relaxed Straight Denim — Vintage Ecru", "mens-relaxed-straight-denim-ecru",
+                350.00m, 26, 370, "100% Undyed Organic Cotton Denim",
+                "Clean full-length straight denim in creamy ecru — iconic Mediterranean quiet luxury paired effortlessly with leather loafers.",
+                "/images/products/vel-dnm-06.jpg"),
+            new("denim", "VEL-DNM-07", "Light-Wash Clean Straight Denim — Sky Blue (Women)", "light-wash-clean-straight-denim-sky-blue",
+                340.00m, 15, 360, "98% Organic Cotton, 2% Elastane",
+                "Clean sunlit medium-light blue denim with crisp tailoring, subtle vintage fade, and classic five-pocket styling.",
+                "/images/products/vel-dnm-07.jpg"),
+            new("denim", "VEL-DNM-08", "Mid-Rise Clean Straight Jeans — Classic Blue (Women)", "mid-rise-clean-straight-jeans-classic-blue",
+                340.00m, 28, 380, "99% Organic Cotton, 1% Elastane",
+                "Timeless vintage-inspired medium blue straight jeans with zero distressing and tailored five-pocket proportions.",
+                "/images/products/vel-dnm-08.jpg"),
+
+            // Coats, Blazers & Outerwear (4 Women + 4 Men)
+            new("jackets", "VEL-OUT-01", "Double-Faced Wool Belted Coat — Camel (Women)", "double-faced-wool-belted-coat-camel",
+                980.00m, 10, 620, "90% Double-Faced Virgin Wool, 10% Cashmere",
+                "Iconic hand-finished wrap coat in signature camel wool featuring wide notched lapels and timeless fluid drape.",
+                "/images/products/vel-out-01.jpg"),
+            new("jackets", "VEL-OUT-02", "Double-Breasted Tailored Blazer — Noir (Women)", "double-breasted-tailored-blazer-noir",
+                640.00m, 18, 340, "100% Fine Tropical Wool",
+                "Architectural tailored black blazer with sharp notched lapels and clean editorial shoulders — pure Zara Studio minimalism.",
+                "/images/products/vel-out-02.jpg"),
+            new("jackets", "VEL-OUT-03", "Classic Belted Gabardine Trench — Stone (Women)", "classic-belted-gabardine-trench-stone",
+                790.00m, 14, 380, "100% Water-Repellent Cotton Gabardine",
+                "Timeless European double-breasted trench coat in warm stone beige with storm flap and tailored waist belt.",
+                "/images/products/vel-out-03.jpg"),
+            new("jackets", "VEL-OUT-04", "Men's Camel Wool Overcoat — Massimo Cut", "mens-camel-wool-overcoat-massimo",
+                1050.00m, 15, 640, "85% Italian Virgin Wool, 15% Cashmere",
+                "Tailored single-breasted men's overcoat in rich warm camel wool with crisp notched lapels and satin interior lining.",
+                "/images/products/vel-out-04.jpg"),
+            new("jackets", "VEL-OUT-05", "Structured Tailored Blazer — Ivory White (Women)", "structured-tailored-blazer-ivory-white",
+                620.00m, 22, 350, "72% Virgin Wool, 28% Silk Blend",
+                "Luminous crisp white tailored blazer with clean single-breasted closure and elongated contemporary European silhouette.",
+                "/images/products/vel-out-05.jpg"),
+            new("jackets", "VEL-OUT-06", "Men's Structured Suit Blazer — Noir", "mens-structured-suit-blazer-noir",
+                740.00m, 16, 360, "100% Super 120s Italian Wool",
+                "Minimalist men's tailored black suit jacket with razor-sharp lapels, welt pockets, and impeccable architectural structure.",
+                "/images/products/vel-out-06.jpg"),
+            new("jackets", "VEL-OUT-07", "Men's Herringbone Tailored Blazer — Charcoal", "mens-herringbone-tailored-blazer-charcoal",
+                690.00m, 8, 380, "100% Portuguese Brushed Wool",
+                "Classic tailored men's blazer crafted in fine wool twill with soft-constructed shoulders for effortless smart-casual elegance.",
+                "/images/products/vel-out-07.jpg"),
+            new("jackets", "VEL-OUT-08", "Men's Minimalist Studio Blazer — Warm Taupe", "mens-minimalist-studio-blazer-taupe",
+                670.00m, 25, 340, "80% Virgin Wool, 20% Linen",
+                "Relaxed contemporary blazer in understated stone-taupe engineered for seamless monochromatic capsule styling.",
+                "/images/products/vel-out-08.jpg")
+        };
+
+        // Seed or in-place upgrade existing catalog (preserves FKs!)
+        if (!context.Categories.Any())
+        {
+            foreach (var c in categorySeeds)
+            {
+                context.Categories.Add(new Category { Slug = c.Slug, Name = c.Name, Description = c.Description });
+            }
+            context.SaveChanges();
+        }
+        else
+        {
+            foreach (var c in categorySeeds)
+            {
+                var existing = context.Categories.FirstOrDefault(x => x.Slug == c.Slug);
+                if (existing != null && (existing.Name != c.Name || existing.Description != c.Description))
+                {
+                    existing.Name = c.Name;
+                    existing.Description = c.Description;
+                }
+            }
             context.SaveChanges();
         }
 
-        // Seed categories & products if empty
-        if (!context.Categories.Any())
+        var categoryMap = context.Categories.ToDictionary(c => c.Slug, c => c.Id);
+
+        if (!context.Products.Any())
         {
-            var catHoodies = new Category
+            foreach (var p in productSeeds)
             {
-                Name = "Heavyweight Hoodies & Sweats",
-                Slug = "hoodies",
-                Description = "Ultra-dense 450 GSM organic fleece staples engineered for enduring comfort and boxy drape."
-            };
-            var catTees = new Category
-            {
-                Name = "Boxy & Relaxed T-Shirts",
-                Slug = "t-shirts",
-                Description = "280 GSM combed organic cotton tees with double-needle collar reinforcement and dropped shoulders."
-            };
-            var catDenim = new Category
-            {
-                Name = "Structured Denim & Cargo",
-                Slug = "denim",
-                Description = "14oz Japanese raw selvedge denim and heavyweight utility double-knee cargo trousers."
-            };
-            var catJackets = new Category
-            {
-                Name = "Weatherproof Jackets & Outerwear",
-                Slug = "jackets",
-                Description = "Technical shell parkas, insulated overshirts, and structured wool overcoats built for all climates."
-            };
-
-            context.Categories.AddRange(catHoodies, catTees, catDenim, catJackets);
+                context.Products.Add(new Product
+                {
+                    CategoryId = categoryMap[p.CategorySlug],
+                    SKU = p.SKU,
+                    Name = p.Name,
+                    Slug = p.Slug,
+                    Price = p.Price,
+                    StockLevel = p.StockLevel,
+                    FabricGsm = p.FabricGsm,
+                    Material = p.Material,
+                    Description = p.Description,
+                    ImageUrl = p.ImageUrl
+                });
+            }
             context.SaveChanges();
-
-            // Seed exactly 32 products (8 per category) with verified local photography
-            var products = new List<Product>
+        }
+        else if (!context.Products.Any(p => p.Name == "Men's Camel Wool Overcoat — Massimo Cut"))
+        {
+            foreach (var p in productSeeds)
             {
-                // Hoodies (8 SKUs)
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-01", Name = "Nocturne Oversized Hoodie",
-                    Slug = "nocturne-oversized-hoodie", Price = 380.00m, StockLevel = 24, FabricGsm = 450,
-                    Description = "Double-layered architectural hood, seamless kangaroo pocket, pre-shrunk heavyweight 450 GSM matte black fleece.",
-                    ImageUrl = "/images/products/vel-hod-01.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-02", Name = "Taupe Brushed Boxy Sweatshirt",
-                    Slug = "taupe-brushed-boxy-sweatshirt", Price = 350.00m, StockLevel = 18, FabricGsm = 420,
-                    Description = "Crewneck design with ribbed collar, dropped shoulders, and brushed fleece thermal lining in warm taupe.",
-                    ImageUrl = "/images/products/vel-hod-02.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-03", Name = "Raw Earth Heavy Zip-Up",
-                    Slug = "raw-earth-heavy-zip-up", Price = 410.00m, StockLevel = 15, FabricGsm = 460,
-                    Description = "Full two-way matte steel zipper with oversized relaxed fit and deep split kangaroo pockets in rich earth brown fleece.",
-                    ImageUrl = "/images/products/vel-hod-03.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-04", Name = "Chalk Minimalist Drop Hoodie",
-                    Slug = "chalk-minimalist-drop-hoodie", Price = 370.00m, StockLevel = 30, FabricGsm = 440,
-                    Description = "Raw unbleached organic cotton fleece with clean drawstring hood, kangaroo pocket, and relaxed streetwear drape.",
-                    ImageUrl = "/images/products/vel-hod-04.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-05", Name = "Vintage Wash French Terry Crew",
-                    Slug = "vintage-wash-french-terry-crew", Price = 340.00m, StockLevel = 22, FabricGsm = 400,
-                    Description = "Heavyweight French terry crewneck in clean off-white featuring ribbed collar, cuffs, and hem.",
-                    ImageUrl = "/images/products/vel-hod-05.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-06", Name = "Crimson Thermal Streetwear Hoodie",
-                    Slug = "crimson-thermal-streetwear-hoodie", Price = 390.00m, StockLevel = 12, FabricGsm = 480,
-                    Description = "Deep crimson red heavyweight fleece pullover hoodie with relaxed drop-shoulder cut and pouch pocket.",
-                    ImageUrl = "/images/products/vel-hod-06.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-07", Name = "Sunburst Graphic Fleece Hoodie",
-                    Slug = "sunburst-graphic-fleece-hoodie", Price = 380.00m, StockLevel = 20, FabricGsm = 450,
-                    Description = "Vibrant mustard heavyweight fleece hoodie featuring custom archival skull and botanical rose artwork.",
-                    ImageUrl = "/images/products/vel-hod-07.jpg"
-                },
-                new() {
-                    CategoryId = catHoodies.Id, SKU = "VEL-HOD-08", Name = "Canary Cropped Streetwear Hoodie",
-                    Slug = "canary-cropped-streetwear-hoodie", Price = 420.00m, StockLevel = 16, FabricGsm = 500,
-                    Description = "Cropped heavyweight fleece hoodie with raw edge hem, matching tonal drawstrings, and relaxed streetwear proportions.",
-                    ImageUrl = "/images/products/vel-hod-08.jpg"
-                },
-
-                // T-Shirts (8 SKUs)
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-01", Name = "Core Heavyweight Tee - Chalk White",
-                    Slug = "core-heavyweight-tee-chalk-white", Price = 170.00m, StockLevel = 45, FabricGsm = 280,
-                    Description = "The quintessential daily boxy tee. Preshrunk 280 GSM combed jersey on clean wooden hanger.",
-                    ImageUrl = "/images/products/vel-tee-01.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-02", Name = "Core Heavyweight Tee - Washed Black",
-                    Slug = "core-heavyweight-tee-washed-black", Price = 170.00m, StockLevel = 50, FabricGsm = 280,
-                    Description = "Garment washed for a vintage soft-hand texture with circular minimalist chest typography emblem.",
-                    ImageUrl = "/images/products/vel-tee-02.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-03", Name = "Anime Graphic Streetwear Tee - Sand",
-                    Slug = "anime-graphic-streetwear-tee-sand", Price = 185.00m, StockLevel = 28, FabricGsm = 260,
-                    Description = "Sand/beige organic combed cotton tee featuring Japanese block print artwork and royal blue accents.",
-                    ImageUrl = "/images/products/vel-tee-03.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-04", Name = "Oversized Minimalist Tee - Moss",
-                    Slug = "oversized-minimalist-tee-moss", Price = 180.00m, StockLevel = 32, FabricGsm = 290,
-                    Description = "Earthy sage-moss tone dyed with low environmental impact pigments, double-needle collar ribbing.",
-                    ImageUrl = "/images/products/vel-tee-04.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-05", Name = "Drop-Tail Organic Cotton Shirt",
-                    Slug = "drop-tail-organic-cotton-shirt", Price = 190.00m, StockLevel = 25, FabricGsm = 270,
-                    Description = "Discreet micro-typography on clean white cotton jersey with reinforced interior taped seams.",
-                    ImageUrl = "/images/products/vel-tee-05.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-06", Name = "Velaris Atelier Typo Graphic Tee",
-                    Slug = "velaris-atelier-typo-graphic-tee", Price = 195.00m, StockLevel = 40, FabricGsm = 280,
-                    Description = "Clean white boxy heavyweight t-shirt featuring bold red typographic block graphic on chest.",
-                    ImageUrl = "/images/products/vel-tee-06.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-07", Name = "Waffle Texture Long-Sleeve - Ecru",
-                    Slug = "waffle-texture-long-sleeve-ecru", Price = 220.00m, StockLevel = 22, FabricGsm = 320,
-                    Description = "Textured thermal waffle knit in light grey/ecru with tailored ribbed cuffs for effortless layering.",
-                    ImageUrl = "/images/products/vel-tee-07.jpg"
-                },
-                new() {
-                    CategoryId = catTees.Id, SKU = "VEL-TEE-08", Name = "Mercerized Graphic Tee - Pitch Black",
-                    Slug = "mercerized-graphic-tee-pitch-black", Price = 210.00m, StockLevel = 35, FabricGsm = 240,
-                    Description = "Silky luster combed cotton tee in deep pitch black with custom bone peace-sign screenprint.",
-                    ImageUrl = "/images/products/vel-tee-08.jpg"
-                },
-
-                // Denim & Trousers (8 SKUs)
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-01", Name = "Raw Indigo Selvedge Wide-Leg (14oz)",
-                    Slug = "raw-indigo-selvedge-wide-leg", Price = 440.00m, StockLevel = 16, FabricGsm = 480,
-                    Description = "Custom Japanese shuttle-loom selvedge denim in deep indigo. Clean wide straight cut with antique copper rivets.",
-                    ImageUrl = "/images/products/vel-dnm-01.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-02", Name = "Washed Black Relaxed Denim",
-                    Slug = "washed-black-relaxed-denim", Price = 390.00m, StockLevel = 24, FabricGsm = 440,
-                    Description = "Soft sulfur wash black denim with authentic knee distressing and relaxed straight-leg drape.",
-                    ImageUrl = "/images/products/vel-dnm-02.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-03", Name = "Classic Selvedge Denim Capsule - Indigo & Black",
-                    Slug = "classic-selvedge-denim-capsule", Price = 410.00m, StockLevel = 19, FabricGsm = 420,
-                    Description = "Three-shade selvedge capsule featuring raw indigo, vintage wash, and midnight black five-pocket denim.",
-                    ImageUrl = "/images/products/vel-dnm-03.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-04", Name = "Heavy Duck Canvas Cargo Trousers",
-                    Slug = "heavy-duck-canvas-cargo-trousers", Price = 425.00m, StockLevel = 20, FabricGsm = 430,
-                    Description = "Streamlined low-profile 3D bellow cargo pockets with reinforced knee seams in washed charcoal duck canvas.",
-                    ImageUrl = "/images/products/vel-dnm-04.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-05", Name = "Tailored Wool Pleated Trousers",
-                    Slug = "tailored-wool-pleated-trousers", Price = 460.00m, StockLevel = 14, FabricGsm = 380,
-                    Description = "High-waisted single front pleat trousers in fine woven cream wool blend with relaxed wide tapered leg.",
-                    ImageUrl = "/images/products/vel-dnm-05.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-06", Name = "Linen-Cotton Relaxed Drawstring Pants",
-                    Slug = "linen-cotton-relaxed-drawstring-pants", Price = 340.00m, StockLevel = 26, FabricGsm = 300,
-                    Description = "Breathable summer blend featuring an elastic waistband with side pockets and relaxed drape.",
-                    ImageUrl = "/images/products/vel-dnm-06.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-07", Name = "Japanese Vintage Wash Straight Denim",
-                    Slug = "japanese-vintage-wash-straight-denim", Price = 450.00m, StockLevel = 15, FabricGsm = 460,
-                    Description = "Light sun-bleached vintage blue denim with authentic distressed abrasion and chain-stitched hems.",
-                    ImageUrl = "/images/products/vel-dnm-07.jpg"
-                },
-                new() {
-                    CategoryId = catDenim.Id, SKU = "VEL-DNM-08", Name = "Technical Water-Repellent Chinos",
-                    Slug = "technical-water-repellent-chinos", Price = 380.00m, StockLevel = 28, FabricGsm = 310,
-                    Description = "DWR coated four-way stretch twill in classic tan/khaki designed for all-weather urban commuting.",
-                    ImageUrl = "/images/products/vel-dnm-08.jpg"
-                },
-
-                // Outerwear (8 SKUs)
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-01", Name = "Minimalist Wool Overcoat - Camel",
-                    Slug = "minimalist-wool-overcoat-camel", Price = 720.00m, StockLevel = 10, FabricGsm = 650,
-                    Description = "Structured tailored double-face camel wool blend with notched lapels and horn button closure.",
-                    ImageUrl = "/images/products/vel-out-01.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-02", Name = "Storm Insulated Winter Parka Jacket",
-                    Slug = "storm-insulated-winter-parka-jacket", Price = 490.00m, StockLevel = 18, FabricGsm = 350,
-                    Description = "Waterproof technical nylon exterior with high funnel collar, hood, and thermal recycled insulation.",
-                    ImageUrl = "/images/products/vel-out-02.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-03", Name = "Weatherproof Shell Parka - Forest Olive",
-                    Slug = "weatherproof-shell-parka-forest-olive", Price = 640.00m, StockLevel = 14, FabricGsm = 420,
-                    Description = "Three-layer taped waterproof rain shell with high-neck storm hood and water-shedding DWR finish.",
-                    ImageUrl = "/images/products/vel-out-03.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-04", Name = "Heavyweight Denim Trucker Jacket",
-                    Slug = "heavyweight-denim-trucker-jacket", Price = 520.00m, StockLevel = 15, FabricGsm = 500,
-                    Description = "Boxy cropped trucker cut in 14.5oz rigid light vintage wash selvedge with side welt pockets.",
-                    ImageUrl = "/images/products/vel-out-04.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-05", Name = "Technical Field Jacket - Military Olive",
-                    Slug = "technical-field-jacket-military-olive", Price = 480.00m, StockLevel = 22, FabricGsm = 400,
-                    Description = "Heavy cotton gabardine field jacket featuring four exterior bellow pockets and button storm placket.",
-                    ImageUrl = "/images/products/vel-out-05.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-06", Name = "Cropped Harrington Jacket - Espresso",
-                    Slug = "cropped-harrington-jacket-espresso", Price = 540.00m, StockLevel = 16, FabricGsm = 380,
-                    Description = "Satin-finish MA-1 Harrington bomber jacket in espresso copper with utility sleeve zip pocket and ribbed trims.",
-                    ImageUrl = "/images/products/vel-out-06.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-07", Name = "Double-Breasted Trench - Camel Gabardine",
-                    Slug = "double-breasted-trench-camel-gabardine", Price = 760.00m, StockLevel = 8, FabricGsm = 550,
-                    Description = "Weather-resistant cotton gabardine trench coat featuring wide lapels, storm flap, and belted cuffs.",
-                    ImageUrl = "/images/products/vel-out-07.jpg"
-                },
-                new() {
-                    CategoryId = catJackets.Id, SKU = "VEL-OUT-08", Name = "Ripstop Windbreaker Coach Jacket - Black",
-                    Slug = "ripstop-windbreaker-coach-jacket-black", Price = 420.00m, StockLevel = 25, FabricGsm = 280,
-                    Description = "Matte black nylon coach jacket with spread collar, zip front, and relaxed streetwear fit for urban layering.",
-                    ImageUrl = "/images/products/vel-out-08.jpg"
+                var existing = context.Products.FirstOrDefault(x => x.SKU == p.SKU);
+                if (existing != null)
+                {
+                    existing.CategoryId = categoryMap[p.CategorySlug];
+                    existing.Name = p.Name;
+                    existing.Slug = p.Slug;
+                    existing.Price = p.Price;
+                    existing.FabricGsm = p.FabricGsm;
+                    existing.Material = p.Material;
+                    existing.Description = p.Description;
+                    existing.ImageUrl = p.ImageUrl;
                 }
-            };
-
-            context.Products.AddRange(products);
+            }
             context.SaveChanges();
         }
     }
 
     private static string BCryptHash(string password)
     {
-        // Simple deterministic salt/hash for seed accounts
         return Convert.ToBase64String(System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(password)));
     }
 }
