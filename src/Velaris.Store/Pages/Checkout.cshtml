@@ -1,0 +1,253 @@
+@page
+@model CheckoutModel
+@{
+    ViewData["Title"] = "Finalizare Comandă (Checkout)";
+}
+
+<div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
+    <!-- Breadcrumb -->
+    <div class="flex items-center space-x-2 text-xs text-slate-400 mb-6">
+        <a href="/" class="hover:text-gold transition">Catalog</a>
+        <span>/</span>
+        <a href="/Cart" class="hover:text-gold transition">Coș</a>
+        <span>/</span>
+        <span class="text-gold font-bold">Checkout Multi-Step (A5)</span>
+    </div>
+
+    <!-- Stepper Indicator -->
+    <div class="max-w-3xl mx-auto mb-10">
+        <div class="grid grid-cols-4 gap-2 text-center text-xs">
+            <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-gold text-canvas font-bold flex items-center justify-center mb-1 shadow-md">1</div>
+                <span class="text-gold font-bold">Date Livrare</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-gold text-canvas font-bold flex items-center justify-center mb-1 shadow-md">2</div>
+                <span class="text-gold font-bold">Curier</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-gold text-canvas font-bold flex items-center justify-center mb-1 shadow-md">3</div>
+                <span class="text-gold font-bold">Sumar</span>
+            </div>
+            <div class="flex flex-col items-center">
+                <div class="w-8 h-8 rounded-full bg-slate-800 border border-slate-700 text-slate-400 font-bold flex items-center justify-center mb-1">4</div>
+                <span class="text-slate-400">Confirmare</span>
+            </div>
+        </div>
+        <div class="w-full bg-slate-800 h-1.5 rounded-full mt-3 overflow-hidden">
+            <div class="bg-gold h-full rounded-full" style="width: 75%"></div>
+        </div>
+    </div>
+
+    @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+    {
+        <div class="max-w-4xl mx-auto mb-6 p-4 rounded-2xl bg-rose-950/40 border border-rose-500/40 text-rose-200 text-sm flex items-start space-x-3 shadow-lg">
+            <svg class="w-5 h-5 text-rose-400 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path></svg>
+            <div>@Model.ErrorMessage</div>
+        </div>
+    }
+
+    <form method="post" id="checkoutForm" class="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
+        <!-- Left: Form Steps (7 cols) -->
+        <div class="lg:col-span-7 space-y-8">
+            <!-- Step 1: Customer & Shipping Information -->
+            <div class="bg-surface/80 border gold-border rounded-3xl p-6 sm:p-7 shadow-xl">
+                <div class="flex items-center space-x-3 pb-4 border-b gold-border mb-6">
+                    <span class="w-7 h-7 rounded-full bg-gold text-canvas text-xs font-bold flex items-center justify-center">1</span>
+                    <h2 class="text-lg font-bold font-display text-white">Date de Contact &amp; Adresă Livrare</h2>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label asp-for="CustomerName" class="block text-xs font-bold uppercase text-slate-300 mb-1.5"></label>
+                        <input asp-for="CustomerName" placeholder="Ex: Popescu Andrei" 
+                               class="w-full bg-canvas border border-slate-700 rounded-xl py-3 px-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                        <span asp-validation-for="CustomerName" class="text-rose-400 text-xs mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="CustomerEmail" class="block text-xs font-bold uppercase text-slate-300 mb-1.5"></label>
+                        <input asp-for="CustomerEmail" type="email" placeholder="andrei@example.com" 
+                               class="w-full bg-canvas border border-slate-700 rounded-xl py-3 px-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                        <span asp-validation-for="CustomerEmail" class="text-rose-400 text-xs mt-1 block"></span>
+                    </div>
+
+                    <div>
+                        <label asp-for="ShippingAddress" class="block text-xs font-bold uppercase text-slate-300 mb-1.5"></label>
+                        <input asp-for="ShippingAddress" placeholder="Str. Calea Victoriei nr. 25, Bl. A, Ap. 12" 
+                               class="w-full bg-canvas border border-slate-700 rounded-xl py-3 px-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                        <span asp-validation-for="ShippingAddress" class="text-rose-400 text-xs mt-1 block"></span>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div>
+                            <label asp-for="City" class="block text-xs font-bold uppercase text-slate-300 mb-1.5"></label>
+                            <input asp-for="City" placeholder="București" 
+                                   class="w-full bg-canvas border border-slate-700 rounded-xl py-3 px-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                            <span asp-validation-for="City" class="text-rose-400 text-xs mt-1 block"></span>
+                        </div>
+                        <div>
+                            <label asp-for="PostalCode" class="block text-xs font-bold uppercase text-slate-300 mb-1.5"></label>
+                            <input asp-for="PostalCode" placeholder="010101" 
+                                   class="w-full bg-canvas border border-slate-700 rounded-xl py-3 px-4 text-xs sm:text-sm text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                            <span asp-validation-for="PostalCode" class="text-rose-400 text-xs mt-1 block"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 2: Delivery Method (Courier Selection) -->
+            <div class="bg-surface/80 border gold-border rounded-3xl p-6 sm:p-7 shadow-xl">
+                <div class="flex items-center space-x-3 pb-4 border-b gold-border mb-6">
+                    <span class="w-7 h-7 rounded-full bg-gold text-canvas text-xs font-bold flex items-center justify-center">2</span>
+                    <h2 class="text-lg font-bold font-display text-white">Selectează Serviciul de Curierat</h2>
+                </div>
+
+                <div class="space-y-3">
+                    <!-- Fan Courier -->
+                    <label class="delivery-option flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition @(Model.DeliveryMethod == "Fan Courier Standard" ? "border-gold bg-canvas/90" : "border-slate-800 bg-canvas/40 hover:border-slate-700")">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="DeliveryMethod" value="Fan Courier Standard" 
+                                   checked="@(Model.DeliveryMethod == "Fan Courier Standard")"
+                                   onchange="updateShipping(15)"
+                                   class="w-4 h-4 text-gold accent-amber-500" />
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold text-white flex items-center">
+                                    <span>Fan Courier Standard</span>
+                                    <span class="ml-2 text-[10px] bg-slate-800 text-slate-300 px-2 py-0.5 rounded-full">2-3 zile lucrătoare</span>
+                                </div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Livrare la ușă în toată România · Notificare SMS</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            @if (Model.Subtotal >= 300m)
+                            {
+                                <span class="text-xs font-bold text-sage">GRATUIT</span>
+                                <span class="text-[10px] text-slate-500 line-through block">15.00 RON</span>
+                            }
+                            else
+                            {
+                                <span class="text-xs font-bold text-white">15.00 RON</span>
+                            }
+                        </div>
+                    </label>
+
+                    <!-- DPD Express Priority -->
+                    <label class="delivery-option flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition @(Model.DeliveryMethod == "DPD Express Priority" ? "border-gold bg-canvas/90" : "border-slate-800 bg-canvas/40 hover:border-slate-700")">
+                        <div class="flex items-center space-x-3">
+                            <input type="radio" name="DeliveryMethod" value="DPD Express Priority" 
+                                   checked="@(Model.DeliveryMethod == "DPD Express Priority")"
+                                   onchange="updateShipping(30)"
+                                   class="w-4 h-4 text-gold accent-amber-500" />
+                            <div>
+                                <div class="text-xs sm:text-sm font-bold text-white flex items-center">
+                                    <span>DPD Express Priority</span>
+                                    <span class="ml-2 text-[10px] bg-gold/20 text-gold px-2 py-0.5 rounded-full font-bold">Următoarea zi</span>
+                                </div>
+                                <div class="text-[11px] text-slate-400 mt-0.5">Livrare expres prioritară până la ora 12:00</div>
+                            </div>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs font-bold text-white">30.00 RON</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+        </div>
+
+        <!-- Right: Step 3 Review & Place Order (5 cols) -->
+        <div class="lg:col-span-5">
+            <div class="bg-surface/90 border gold-border rounded-3xl p-6 sm:p-7 shadow-2xl sticky top-28">
+                <div class="flex items-center space-x-3 pb-4 border-b gold-border mb-4">
+                    <span class="w-7 h-7 rounded-full bg-gold text-canvas text-xs font-bold flex items-center justify-center">3</span>
+                    <h2 class="text-lg font-bold font-display text-white">Sumar &amp; Confirmare Comandă</h2>
+                </div>
+
+                <!-- Line Items Mini List -->
+                <div class="max-h-60 overflow-y-auto space-y-3 pr-2 mb-4">
+                    @foreach (var item in Model.CartItems)
+                    {
+                        var lineTotal = (item.Product?.Price ?? 0m) * item.Quantity;
+                        <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800/60">
+                            <div class="flex items-center space-x-3">
+                                <img src="@(item.Product?.ImageUrl ?? "/images/products/nocturne-oversized-hoodie.jpg")" 
+                                     alt="@(item.Product?.Name)" 
+                                     class="w-10 h-12 object-cover rounded-lg border border-slate-800" />
+                                <div>
+                                    <span class="font-bold text-white line-clamp-1">@item.Product?.Name</span>
+                                    <span class="text-slate-400 text-[11px]">Mărime: <strong class="text-gold">@item.SelectedSize</strong> &bull; Qty: @item.Quantity</span>
+                                </div>
+                            </div>
+                            <div class="font-bold text-white text-right">
+                                @lineTotal.ToString("F2") RON
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <!-- Cost Breakdown -->
+                <div class="space-y-2.5 text-xs text-slate-300 pt-2 border-t border-slate-800">
+                    <div class="flex justify-between">
+                        <span>Subtotal articole</span>
+                        <span class="font-bold text-white">@Model.Subtotal.ToString("F2") RON</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span>Cost Transport</span>
+                        <span id="shippingDisplay" class="font-bold text-white">@Model.ShippingCost.ToString("F2") RON</span>
+                    </div>
+                    <div class="flex justify-between text-slate-400 text-[11px]">
+                        <span>TVA (19% inclus)</span>
+                        <span>@((Model.Subtotal * 0.19m / 1.19m).ToString("F2")) RON</span>
+                    </div>
+                </div>
+
+                <!-- Total -->
+                <div class="border-t gold-border pt-4 mt-4 flex justify-between items-baseline">
+                    <span class="text-base font-bold text-white">Total de Plată</span>
+                    <span id="totalDisplay" class="text-2xl font-extrabold text-gold font-display">
+                        @Model.TotalAmount.ToString("F2") RON
+                    </span>
+                </div>
+
+                <!-- Submit Button -->
+                <div class="mt-6 space-y-3">
+                    <button type="submit" 
+                            class="w-full bg-gold hover:bg-gold-light text-canvas text-sm font-bold py-4 px-6 rounded-2xl shadow-xl transition duration-200 flex items-center justify-center">
+                        <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                        <span>Plasează Comanda (Pasul 4)</span>
+                    </button>
+                    <p class="text-[11px] text-center text-slate-400 leading-relaxed">
+                        Prin plasarea comenzii ești de acord cu termenii VELARIS Atelier. Se va genera automat numărul tău unic de comandă (A5).
+                    </p>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    var subtotal = @Model.Subtotal;
+
+    function updateShipping(cost) {
+        var shippingFee = cost;
+        if (cost === 15 && subtotal >= 300) {
+            shippingFee = 0;
+            document.getElementById('shippingDisplay').innerText = "Gratuit";
+        } else {
+            document.getElementById('shippingDisplay').innerText = shippingFee.toFixed(2) + " RON";
+        }
+        var total = subtotal + shippingFee;
+        document.getElementById('totalDisplay').innerText = total.toFixed(2) + " RON";
+
+        // Update styling of radio wrappers
+        var options = document.querySelectorAll('.delivery-option');
+        options.forEach(function(opt) {
+            var radio = opt.querySelector('input[type="radio"]');
+            if (radio && radio.checked) {
+                opt.className = "delivery-option flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition border-gold bg-canvas/90";
+            } else {
+                opt.className = "delivery-option flex items-center justify-between p-4 rounded-2xl border cursor-pointer transition border-slate-800 bg-canvas/40 hover:border-slate-700";
+            }
+        });
+    }
+</script>

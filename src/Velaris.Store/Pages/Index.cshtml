@@ -2,29 +2,33 @@
 @model IndexModel
 @{
     ViewData["Title"] = "Capsule Catalogue";
+    var activeUrl = Model.GetPageUrl(Model.CurrentPage);
 }
 
 <!-- Hero Editorial Banner -->
-<section class="py-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b gold-border">
+<section class="py-10 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto border-b gold-border">
     <div class="flex flex-col md:flex-row md:items-end justify-between gap-6">
         <div>
-            <span class="text-xs uppercase tracking-widest text-gold font-bold">Atelier Capsule Drop · 2026</span>
-            <h1 class="text-4xl sm:text-5xl font-extrabold font-display tracking-tight text-white mt-2">
-                Curated Streetwear Essentials
+            <span class="text-xs uppercase tracking-widest text-gold font-bold">Atelier Capsule Drop · 2026/2027</span>
+            <h1 class="text-3xl sm:text-5xl font-extrabold font-display tracking-tight text-white mt-2">
+                Streetwear &amp; Sustainable Capsule
             </h1>
-            <p class="text-slate-400 text-sm sm:text-base mt-2 max-w-xl">
-                Minimalist silhouettes, heavyweight fabrics (up to 500 GSM), and certified organic textiles. Designed for timeless capsule rotation.
+            <p class="text-slate-400 text-xs sm:text-sm mt-2 max-w-xl leading-relaxed">
+                Siluete minimaliste, țesături heavyweight organice (până la 500 GSM) și estetică urbană durabilă. Piese concepute pentru versatilitate capsule.
             </p>
         </div>
 
         <!-- Category Filter Pills -->
         <div class="flex flex-wrap gap-2">
-            <a href="/" class="px-4 py-1.5 rounded-full text-xs font-semibold border transition @(string.IsNullOrEmpty(Model.CurrentCategory) ? "bg-gold text-canvas border-gold" : "border-slate-700 text-slate-300 hover:border-gold")">
-                All (32)
+            <a href="/?sort=@Model.Sort" 
+               class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition @(string.IsNullOrEmpty(Model.CurrentCategory) ? "bg-gold text-canvas border-gold font-bold shadow-md" : "border-slate-800 bg-surface text-slate-300 hover:border-gold")">
+                Toate (@(Model.Categories.Any() ? "32" : "Toate"))
             </a>
             @foreach (var cat in Model.Categories)
             {
-                <a href="/?category=@cat.Slug" class="px-4 py-1.5 rounded-full text-xs font-semibold border transition @(Model.CurrentCategory == cat.Slug ? "bg-gold text-canvas border-gold" : "border-slate-700 text-slate-300 hover:border-gold")">
+                var isSelected = Model.CurrentCategory == cat.Slug;
+                <a href="/?category=@cat.Slug@(string.IsNullOrEmpty(Model.Sort) ? "" : $"&sort={Model.Sort}")@(Model.InStock == true ? "&inStock=true" : "")" 
+                   class="px-3.5 py-1.5 rounded-full text-xs font-semibold border transition @(isSelected ? "bg-gold text-canvas border-gold font-bold shadow-md" : "border-slate-800 bg-surface text-slate-300 hover:border-gold")">
                     @cat.Name
                 </a>
             }
@@ -32,31 +36,141 @@
     </div>
 </section>
 
-<!-- Product Catalog Grid -->
-<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-    @if (!string.IsNullOrWhiteSpace(Model.SearchQuery))
-    {
-        <div class="mb-6 flex items-center justify-between bg-surface border gold-border p-4 rounded-xl">
-            <span class="text-sm text-slate-300">
-                Search results for: <strong class="text-gold">"@Model.SearchQuery"</strong>
-            </span>
-            <a href="/" class="text-xs text-slate-400 hover:text-white underline">Clear search</a>
+<!-- Advanced Filter & Sort Bar (B1 - 5p Bonus) -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-8">
+    <div class="bg-surface/80 border gold-border rounded-2xl p-4 sm:p-5 shadow-lg">
+        <form method="get" action="/" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-12 gap-4 items-center">
+            @if (!string.IsNullOrEmpty(Model.CurrentCategory))
+            {
+                <input type="hidden" name="category" value="@Model.CurrentCategory" />
+            }
+
+            <!-- Search input -->
+            <div class="lg:col-span-3">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Căutare Articol</label>
+                <div class="relative">
+                    <input type="text" name="search" value="@Model.SearchQuery" placeholder="Ex: hoodie, denim, tricou..." 
+                           class="w-full bg-canvas border border-slate-700 rounded-xl py-2 pl-3 pr-8 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                    @if (!string.IsNullOrEmpty(Model.SearchQuery))
+                    {
+                        <a href="/?@(string.IsNullOrEmpty(Model.CurrentCategory) ? "" : $"category={Model.CurrentCategory}")" class="absolute right-2.5 top-2.5 text-slate-400 hover:text-white text-xs">✕</a>
+                    }
+                </div>
+            </div>
+
+            <!-- Price Range (Min/Max) -->
+            <div class="lg:col-span-3">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Interval Preț (RON)</label>
+                <div class="flex items-center space-x-2">
+                    <input type="number" name="minPrice" value="@Model.MinPrice" placeholder="Min" min="0" step="10"
+                           class="w-1/2 bg-canvas border border-slate-700 rounded-xl py-2 px-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                    <span class="text-slate-500 text-xs">-</span>
+                    <input type="number" name="maxPrice" value="@Model.MaxPrice" placeholder="Max" min="0" step="10"
+                           class="w-1/2 bg-canvas border border-slate-700 rounded-xl py-2 px-3 text-xs text-white placeholder-slate-500 focus:outline-none focus:border-gold" />
+                </div>
+            </div>
+
+            <!-- In Stock Checkbox -->
+            <div class="lg:col-span-2 flex items-center lg:justify-center pt-2 sm:pt-4">
+                <label class="inline-flex items-center space-x-2 cursor-pointer text-xs text-slate-300 select-none">
+                    <input type="checkbox" name="inStock" value="true" @(Model.InStock == true ? "checked" : "")
+                           class="w-4 h-4 rounded border-slate-700 bg-canvas text-gold focus:ring-gold accent-amber-500" />
+                    <span>Doar în stoc</span>
+                </label>
+            </div>
+
+            <!-- Sorting Dropdown -->
+            <div class="lg:col-span-2">
+                <label class="block text-[11px] font-bold uppercase tracking-wider text-slate-400 mb-1">Sortare</label>
+                <select name="sort" class="w-full bg-canvas border border-slate-700 rounded-xl py-2 px-3 text-xs text-white focus:outline-none focus:border-gold">
+                    <option value="" selected="@(string.IsNullOrEmpty(Model.Sort))">Recomandate</option>
+                    <option value="price-asc" selected="@(Model.Sort == "price-asc")">Preț: Mic &rarr; Mare</option>
+                    <option value="price-desc" selected="@(Model.Sort == "price-desc")">Preț: Mare &rarr; Mic</option>
+                    <option value="newest" selected="@(Model.Sort == "newest")">Cele mai noi</option>
+                </select>
+            </div>
+
+            <!-- Submit & Reset Actions -->
+            <div class="lg:col-span-2 flex items-center space-x-2 pt-2 sm:pt-4">
+                <button type="submit" class="flex-grow bg-gold hover:bg-gold-light text-canvas text-xs font-bold py-2.5 px-3 rounded-xl transition shadow-md">
+                    Filtrează
+                </button>
+                <a href="/" title="Resetează toate filtrele" class="p-2.5 rounded-xl border border-slate-700 bg-canvas text-slate-400 hover:text-white hover:border-slate-500 transition">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </a>
+            </div>
+        </form>
+
+        <!-- Active Filters Summary Badge Pills -->
+        @if (!string.IsNullOrEmpty(Model.SearchQuery) || Model.MinPrice.HasValue || Model.MaxPrice.HasValue || Model.InStock == true || !string.IsNullOrEmpty(Model.Sort))
+        {
+            <div class="mt-4 pt-3 border-t border-slate-800 flex flex-wrap items-center gap-2 text-xs">
+                <span class="text-slate-400">Filtre active:</span>
+                @if (!string.IsNullOrEmpty(Model.SearchQuery))
+                {
+                    <span class="bg-surface border border-gold/40 text-gold px-2.5 py-1 rounded-full">Cautare: "@Model.SearchQuery"</span>
+                }
+                @if (Model.MinPrice.HasValue)
+                {
+                    <span class="bg-surface border border-gold/40 text-gold px-2.5 py-1 rounded-full">&ge; @Model.MinPrice RON</span>
+                }
+                @if (Model.MaxPrice.HasValue)
+                {
+                    <span class="bg-surface border border-gold/40 text-gold px-2.5 py-1 rounded-full">&le; @Model.MaxPrice RON</span>
+                }
+                @if (Model.InStock == true)
+                {
+                    <span class="bg-surface border border-gold/40 text-gold px-2.5 py-1 rounded-full">Doar în stoc</span>
+                }
+                @if (!string.IsNullOrEmpty(Model.Sort))
+                {
+                    <span class="bg-surface border border-gold/40 text-gold px-2.5 py-1 rounded-full">Sortare: @Model.Sort</span>
+                }
+                <a href="/" class="text-xs text-rose-400 hover:underline ml-2">Șterge toate filtrele</a>
+            </div>
+        }
+    </div>
+</section>
+
+<!-- Feedback Messages -->
+@if (!string.IsNullOrEmpty(Model.SuccessMessage))
+{
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mt-6">
+        <div class="p-4 rounded-2xl bg-emerald-950/40 border border-emerald-500/40 text-emerald-200 text-xs sm:text-sm flex items-center justify-between shadow-lg">
+            <div class="flex items-center space-x-2">
+                <svg class="w-4 h-4 text-emerald-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                <span>@Model.SuccessMessage</span>
+            </div>
+            <a href="/Wishlist" class="text-gold underline hover:text-gold-light font-bold">Vezi Favorite &rarr;</a>
         </div>
-    }
+    </div>
+}
+
+<!-- Product Catalog Grid -->
+<section class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div class="flex justify-between items-center mb-6 text-xs text-slate-400">
+        <div>
+            Afișare: <strong class="text-white">@Model.Products.Count</strong> din <strong class="text-white">@Model.TotalItems</strong> piese vestimentare
+        </div>
+        @if (Model.TotalPages > 1)
+        {
+            <div>Pagina <strong class="text-gold">@Model.CurrentPage</strong> din @Model.TotalPages</div>
+        }
+    </div>
 
     @if (!Model.Products.Any())
     {
-        <!-- Empty State (Requirement A2) -->
-        <div class="text-center py-24 bg-surface border gold-border rounded-2xl p-8 max-w-lg mx-auto">
-            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800 flex items-center justify-center text-slate-400">
+        <!-- Empty State -->
+        <div class="text-center py-20 bg-surface/70 border gold-border rounded-3xl p-8 max-w-lg mx-auto">
+            <div class="w-16 h-16 mx-auto mb-4 rounded-full bg-slate-800 border gold-border flex items-center justify-center text-slate-400">
                 <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
             </div>
-            <h3 class="text-lg font-bold text-white mb-2">No garments found</h3>
+            <h3 class="text-lg font-bold text-white mb-2 font-display">Niciun produs găsit</h3>
             <p class="text-slate-400 text-xs leading-relaxed mb-6">
-                We couldn't find any clothing items matching your search criteria. Try a different keyword like "hoodie", "denim", or browse our category collections.
+                Nu am găsit piese care să corespundă criteriilor alese. Încearcă să extinzi intervalul de preț sau să resetezi filtrele.
             </p>
-            <a href="/" class="inline-block bg-gold text-canvas text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold-light transition">
-                Reset All Filters
+            <a href="/" class="inline-block bg-gold text-canvas text-xs font-bold px-6 py-2.5 rounded-full hover:bg-gold-light transition shadow-md">
+                Resetează Toate Filtrele (B1)
             </a>
         </div>
     }
@@ -65,36 +179,75 @@
         <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
             @foreach (var item in Model.Products)
             {
-                <div class="bg-surface border gold-border rounded-2xl overflow-hidden flex flex-col group hover:border-gold/60 transition shadow-lg">
-                    <!-- Image Container -->
+                var isInWishlist = Model.WishlistProductIds.Contains(item.Id);
+                var isStockLow = item.StockLevel > 0 && item.StockLevel <= 5;
+
+                <div class="bg-surface/80 border gold-border rounded-2xl overflow-hidden flex flex-col group hover:border-gold/60 transition duration-300 shadow-xl">
+                    <!-- Image Container with Wishlist Pin -->
                     <div class="relative aspect-[4/5] overflow-hidden bg-slate-900">
-                        <img src="@item.ImageUrl" alt="@item.Name" 
-                             class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500" loading="lazy" />
+                        <a href="/Product/@item.Slug" class="block w-full h-full">
+                            <img src="@item.ImageUrl" alt="@item.Name" 
+                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500" loading="lazy" />
+                        </a>
+
                         <div class="absolute top-3 left-3 bg-canvas/80 backdrop-blur-md border gold-border px-2.5 py-1 rounded-full text-[10px] font-bold text-gold uppercase tracking-wider">
                             @item.FabricGsm GSM
                         </div>
-                        <div class="absolute top-3 right-3 bg-canvas/80 backdrop-blur-md px-2.5 py-1 rounded-full text-[10px] font-bold @(item.StockLevel > 0 ? "text-sage" : "text-terracotta")">
-                            @(item.StockLevel > 0 ? $"{item.StockLevel} in stock" : "Sold Out")
-                        </div>
+
+                        <!-- Wishlist Heart Button (B7) -->
+                        <form method="post" asp-page-handler="ToggleWishlist" class="absolute top-3 right-3 z-10">
+                            <input type="hidden" name="productId" value="@item.Id" />
+                            <input type="hidden" name="returnUrl" value="@activeUrl" />
+                            <button type="submit" 
+                                    title="@(isInWishlist ? "Elimină din favorite" : "Salvează la favorite (B7)")"
+                                    class="w-8 h-8 rounded-full bg-canvas/80 backdrop-blur-md border gold-border flex items-center justify-center text-rose-500 hover:scale-110 transition shadow-md">
+                                @if (isInWishlist)
+                                {
+                                    <svg class="w-4 h-4 fill-rose-500 text-rose-500" viewBox="0 0 24 24"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>
+                                }
+                                else
+                                {
+                                    <svg class="w-4 h-4 fill-none stroke-current" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/></svg>
+                                }
+                            </button>
+                        </form>
                     </div>
 
                     <!-- Details -->
-                    <div class="p-5 flex flex-col flex-grow">
-                        <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400">@item.Category?.Name</span>
-                        <h3 class="text-base font-bold text-white mt-1 group-hover:text-gold transition font-display">
-                            <a href="/Product?slug=@item.Slug">@item.Name</a>
-                        </h3>
-                        <p class="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
-                            @item.Description
-                        </p>
+                    <div class="p-5 flex flex-col flex-grow justify-between">
+                        <div>
+                            <div class="flex items-center justify-between text-[11px]">
+                                <span class="font-bold uppercase tracking-wider text-gold">@item.Category?.Name</span>
+                                @if (item.StockLevel > 5)
+                                {
+                                    <span class="text-sage font-medium">În stoc</span>
+                                }
+                                else if (isStockLow)
+                                {
+                                    <span class="text-amber-400 font-bold">Doar @item.StockLevel buc.</span>
+                                }
+                                else
+                                {
+                                    <span class="text-terracotta font-bold">Epuizat</span>
+                                }
+                            </div>
 
-                        <div class="mt-auto pt-4 border-t border-slate-800 flex items-center justify-between">
+                            <h3 class="text-base font-bold text-white mt-1 group-hover:text-gold transition font-display">
+                                <a href="/Product/@item.Slug">@item.Name</a>
+                            </h3>
+
+                            <p class="text-xs text-slate-400 mt-2 line-clamp-2 leading-relaxed">
+                                @item.Description
+                            </p>
+                        </div>
+
+                        <div class="mt-4 pt-4 border-t border-slate-800 flex items-center justify-between">
                             <div>
-                                <span class="text-xs text-slate-400">Price</span>
+                                <span class="text-[10px] text-slate-400 uppercase tracking-wider">Preț</span>
                                 <div class="text-base font-extrabold text-white">@item.Price.ToString("F2") RON</div>
                             </div>
-                            <a href="/Product?slug=@item.Slug" class="bg-slate-800 hover:bg-gold hover:text-canvas text-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl transition">
-                                View Specs
+                            <a href="/Product/@item.Slug" class="bg-surface hover:bg-gold hover:text-canvas border gold-border text-slate-200 text-xs font-bold px-3.5 py-2 rounded-xl transition shadow-sm">
+                                Vezi Detalii &rarr;
                             </a>
                         </div>
                     </div>
@@ -102,22 +255,22 @@
             }
         </div>
 
-        <!-- Pagination Controls (Requirement A1) -->
+        <!-- Pagination Controls with Query String Preservation (A1 & B1) -->
         @if (Model.TotalPages > 1)
         {
             <div class="mt-12 flex justify-center items-center space-x-2">
                 @if (Model.CurrentPage > 1)
                 {
                     <a href="@Model.GetPageUrl(Model.CurrentPage - 1)" 
-                       class="px-4 py-2 rounded-lg bg-surface border gold-border text-xs text-slate-300 hover:text-gold transition">
-                        &larr; Prev
+                       class="px-4 py-2 rounded-xl bg-surface border gold-border text-xs text-slate-300 hover:text-gold hover:border-gold transition">
+                        &larr; Înapoi
                     </a>
                 }
                 
                 @for (int i = 1; i <= Model.TotalPages; i++)
                 {
                     <a href="@Model.GetPageUrl(i)" 
-                       class="w-8 h-8 flex items-center justify-center rounded-lg text-xs font-bold border transition @(i == Model.CurrentPage ? "bg-gold text-canvas border-gold font-black shadow-md" : "bg-surface border-slate-700 text-slate-300 hover:border-gold hover:text-gold")">
+                       class="w-9 h-9 flex items-center justify-center rounded-xl text-xs font-bold border transition @(i == Model.CurrentPage ? "bg-gold text-canvas border-gold font-black shadow-md" : "bg-surface border-slate-800 text-slate-300 hover:border-gold hover:text-gold")">
                         @i
                     </a>
                 }
@@ -125,8 +278,8 @@
                 @if (Model.CurrentPage < Model.TotalPages)
                 {
                     <a href="@Model.GetPageUrl(Model.CurrentPage + 1)" 
-                       class="px-4 py-2 rounded-lg bg-surface border gold-border text-xs text-slate-300 hover:text-gold transition">
-                        Next &rarr;
+                       class="px-4 py-2 rounded-xl bg-surface border gold-border text-xs text-slate-300 hover:text-gold hover:border-gold transition">
+                        Înainte &rarr;
                     </a>
                 }
             </div>
