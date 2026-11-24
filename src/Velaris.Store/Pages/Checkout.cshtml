@@ -170,9 +170,9 @@
                         var lineTotal = (item.Product?.Price ?? 0m) * item.Quantity;
                         <div class="flex items-center justify-between text-xs py-2 border-b border-slate-800/60">
                             <div class="flex items-center space-x-3">
-                                <img src="@(item.Product?.ImageUrl ?? "/images/products/nocturne-oversized-hoodie.jpg")" 
+                                <img src="@(item.Product?.ImageUrl ?? "/images/products/vel-hod-01.jpg")" asp-append-version="true"
                                      alt="@(item.Product?.Name)" 
-                                     class="w-10 h-12 object-cover rounded-lg border border-slate-800" />
+                                     class="w-10 h-12 object-cover object-top rounded-lg border border-slate-800" />
                                 <div>
                                     <span class="font-bold text-white line-clamp-1">@item.Product?.Name</span>
                                     <span class="text-slate-400 text-[11px]">Mărime: <strong class="text-gold">@item.SelectedSize</strong> &bull; Qty: @item.Quantity</span>

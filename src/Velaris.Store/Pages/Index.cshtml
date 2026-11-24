@@ -186,8 +186,8 @@
                     <!-- Image Container with Wishlist Pin -->
                     <div class="relative aspect-[4/5] overflow-hidden bg-slate-900">
                         <a href="/Product/@item.Slug" class="block w-full h-full">
-                            <img src="@item.ImageUrl" alt="@item.Name" 
-                                 class="w-full h-full object-cover object-center group-hover:scale-105 transition duration-500" loading="lazy" />
+                            <img src="@item.ImageUrl" asp-append-version="true" alt="@item.Name" 
+                                 class="w-full h-full object-cover object-top group-hover:scale-105 transition duration-500" loading="lazy" />
                         </a>
 
                         <div class="absolute top-3 left-3 bg-canvas/80 backdrop-blur-md border gold-border px-2.5 py-1 rounded-full text-[10px] font-bold text-gold uppercase tracking-wider">

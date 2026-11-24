@@ -113,9 +113,9 @@
                     <div class="bg-surface/70 border gold-border rounded-2xl p-4 sm:p-5 flex flex-col sm:flex-row items-center sm:items-stretch gap-5 transition hover:border-gold/40">
                         <!-- Product Thumbnail -->
                         <div class="w-24 h-28 sm:w-28 sm:h-32 rounded-xl overflow-hidden bg-canvas border border-slate-800 flex-shrink-0 relative">
-                            <img src="@(product?.ImageUrl ?? "/images/products/nocturne-oversized-hoodie.jpg")" 
+                            <img src="@(product?.ImageUrl ?? "/images/products/vel-hod-01.jpg")" asp-append-version="true"
                                  alt="@(product?.Name ?? "Garment")" 
-                                 class="w-full h-full object-cover" />
+                                 class="w-full h-full object-cover object-top" />
                             @if (product != null && product.StockLevel < item.Quantity)
                             {
                                 <div class="absolute inset-0 bg-rose-950/80 backdrop-blur-xs flex items-center justify-center text-center p-1">

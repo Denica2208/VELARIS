@@ -44,7 +44,7 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-12 items-start">
             <!-- Image Gallery & Wishlist Pin -->
             <div class="bg-surface border gold-border rounded-3xl overflow-hidden aspect-[4/5] relative shadow-2xl">
-                <img src="@Model.Product.ImageUrl" alt="@Model.Product.Name" class="w-full h-full object-cover" />
+                <img src="@Model.Product.ImageUrl" asp-append-version="true" alt="@Model.Product.Name" class="w-full h-full object-cover object-top" />
                 
                 <div class="absolute top-4 left-4 bg-canvas/90 backdrop-blur-md border gold-border px-3.5 py-1.5 rounded-full text-xs font-bold text-gold uppercase tracking-wider">
                     @Model.Product.FabricGsm GSM Densitate Textilă
